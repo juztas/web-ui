@@ -1,0 +1,54 @@
+.link-link {
+  fill: none;
+  stroke: #999;
+  stroke-width: 6.5px;
+}
+
+.host-link {
+  fill: none;
+  stroke: #999;
+  stroke-width: 6.5px;
+}
+
+.port-link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 0px;
+}
+
+.switch-circle {
+  fill: #000;
+  stroke: #B94431;
+  stroke-width: 3.5px;
+}
+
+.host-circle {
+  fill: red;
+  stroke: #B94431;
+  stroke-width: 3.5px;
+}
+
+.port-circle {
+  stroke: #B94431;
+  stroke-width: 1.5px;
+  fill: #000;
+}
+
+node {
+  display: none;
+  position: absolute;
+}
+
+.switch text {
+  font-size: 12px;
+}
+
+.port text {
+  font-size: 12px;
+}
+
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}

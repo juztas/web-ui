@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+  
+    <title>OpenFlow Next Generation Project - Web GUI</title>
+  
+    <!-- CSS -->
+    <link type="text/css" href="/static/assets/css/font-awesome.min.css" rel="stylesheet">
+    <link type="text/css" href="/static/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" href="/static/assets/css/simple-sidebar.css" rel="stylesheet">
+
+    <link type="text/css" href="/static/assets/css/main.css" rel="stylesheet">
+    <link type="text/css" href="/static/assets/css/chart.css" rel="stylesheet">
+  
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+    <script src="/static/assets/js/jquery-1.11.3.min.js"></script>
+    <script src="/static/assets/js/d3.min.js"></script>
+    <script src="/static/assets/js/bootstrap.min.js"></script>
+    <script src="/static/assets/js/handlebars.min-latest.js"></script>
+
+    <script src="/static/assets/js/charts.js"></script>
+    <script src="/static/assets/js/main.js"></script>
+  
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <div id="sidebar-wrapper" class="sidebar sidebar-nav navbar-collapse">
+        <ul class="nav">
+          <li><a href="#" data-toggle="modal" data-target="#L2RouteCalculationModal"><i class="fa fa-fw fa-exchange"></i> L2 Route Calculation</a></li>
+          <li><a href="#" data-toggle="modal" data-target="#L3RouteCalculationModal"><i class="fa fa-fw fa-exchange"></i> L3 Route Calculation</a></li>
+          <li><a href="/flows"><i class="fa fa-fw fa-th-list"></i> All Flows</a></li>
+        </ul>
+      </div><!-- /#sidebar-wrapper -->
+  
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <div class="row">
+                <div class="col-lg-12">
+
+                  <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                    <button type="button" id="menu-toggle" class="btn btn-default"><i class="fa fa-fw fa-bars"></i> Toggle Menu</button>
+                    <button type="button" id="zoom-mode" class="btn btn-default"><i class="fa fa-search"></i> Zoom Mode</button>
+                    <button type="button" id="save-layout" class="btn btn-default"><i class="fa fa-cloud-upload"></i> Save Layout</button>
+                    <button type="button" id="load-layout" class="btn btn-default"><i class="fa fa-cloud-download"></i> Load Layout</button>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        View
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a id="panel-toggle" href="#">Info Panel</a></li>
+                        <li><a id="unused-ports-toggle" href="#">Unused Ports</a></li>
+                      </ul>
+                    </div>
+
+
+                  
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Switch label
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a id="change-switch-label-none" href="#">None</a></li>
+                        <li><a id="change-switch-label-id" href="#">ID</a></li>
+                        <li><a id="change-switch-label-description" href="#">Description</a></li>
+                        <li><a id="change-switch-label-address" href="#">IP Address</a></li>
+                        <li><a id="change-switch-label-manufacturer" href="#">Manufacturer</a></li>
+                      </ul>
+                    </div>
+
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Port label
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a id="change-port-label-none" href="#">None</a></li>
+                        <li><a id="change-port-label-number" href="#">Port Number</a></li>
+                        <li><a id="change-port-label-name" href="#">Port Name</a></li>
+                      </ul>
+                    </div>
+
+                  </div>
+
+                </div>
+
+  	          <div id="graph"></div>
+              <div class="" id="alert" role="alert"></div>
+              <nav>
+                 <span id="node-details"></span>
+              </nav>
+          </div>
+        </div> <!-- /.container-fluid -->
+      </div> <!-- /#page-content-wrapper -->
+
+    </div> <!-- /#wrapper -->
+ 
+    <script language="javascript">
+
+      $(document).ready(function() {
+        $.ajax({
+          type: "GET",
+          url: "/api/topology",
+          success: function (topology) {
+                    chart = new D3Force(topology['nodes'],
+                                        topology['links'],
+                                        "#graph");
+                    chart.load_layout();
+                   },  
+          dataType: "json"
+        });
+      });
+
+      $("#menu-toggle").click(function(e) {
+          e.preventDefault();
+          $("#wrapper").toggleClass("toggled");
+      });
+    
+      $("#zoom-mode").click(function(e) {
+          zoom = ! zoom;
+      });
+
+      /* Save positions */
+      d3.select('#save-layout').on('click', function() {
+        chart.save_layout()
+      });
+    
+      /* Restore positions */
+      d3.select('#load-layout').on('click', function() {
+        chart.load_layout();
+      });
+
+      /* switch labels */
+      d3.select('#change-switch-label-none').on('click', function() {
+        chart.clear_switch_labels();
+      });
+      d3.select('#change-switch-label-id').on('click', function() {
+        chart.show_switch_labels('id');
+      });
+      d3.select('#change-switch-label-description').on('click', function() {
+        chart.show_switch_labels('description');
+      });
+      d3.select('#change-switch-label-address').on('click', function() {
+        chart.show_switch_labels('ip_address');
+      });
+      d3.select('#change-switch-label-manufacturer').on('click', function() {
+        chart.show_switch_labels('manufacturer');
+      });
+
+      /* port labels */
+      d3.select('#change-port-label-none').on('click', function() {
+        chart.clear_port_labels();
+      });
+      d3.select('#change-port-label-number').on('click', function() {
+        chart.show_port_labels('port_number');
+      });
+      d3.select('#change-port-label-name').on('click', function() {
+        chart.show_port_labels('name');
+      });
+      d3.select("#unused-ports-toggle").on('click', function() {
+        chart.toggle_unused_ports();
+      });
+
+    </script> 
+  </body>
+</html>
