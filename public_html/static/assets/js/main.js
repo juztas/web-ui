@@ -13,3 +13,24 @@ function show_msg(msg, type, timeout) {
     });
   }, timeout);
 }
+
+function clear_pannel_info() {
+  $("#node-details").html('');
+}
+
+function getTemplateAjax(path, callback) {
+  var source;
+  var template;
+
+  $.ajax({
+    url: '/static/assets/templates/' + path,
+    cache: false,
+    success: function(data) {
+      source    = data;
+      template  = Handlebars.compile(source);
+
+      //execute the callback if passed
+      if (callback) callback(template);
+    }
+  });
+}

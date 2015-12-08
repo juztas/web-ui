@@ -13,7 +13,7 @@ app.debug = True
 @app.route('/layout', methods=['POST', 'GET'])
 def layout():
     client_ip = "%s" % flask.request.environ['REMOTE_ADDR']
-    filename = "%s/%s-layout.p" % (layout_dir, client_ip)
+    filename = "%s/%s-layout.p" % (layouts_dir, client_ip)
 
     if flask.request.method == 'POST':
         data = json.loads(flask.request.get_data().decode('utf-8'))
@@ -22,7 +22,7 @@ def layout():
         try:
             data = pickle.load(open(filename, "rb"))
         except IOError:
-            data = pickle.load(open("%s/layout.p" % layout_dir, "rb"))
+            data = pickle.load(open("%s/layout.p" % layouts_dir, "rb"))
         return flask.jsonify(data)
 
     return flask.redirect("/")

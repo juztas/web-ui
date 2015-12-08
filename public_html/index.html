@@ -67,8 +67,6 @@
                       </ul>
                     </div>
 
-
-                  
                     <div class="btn-group btn-group-sm" role="group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Switch label
@@ -101,14 +99,14 @@
 
   	          <div id="graph"></div>
               <div class="" id="alert" role="alert"></div>
-              <nav>
-                 <span id="node-details"></span>
-              </nav>
-          </div>
+         </div>
         </div> <!-- /.container-fluid -->
       </div> <!-- /#page-content-wrapper -->
-
     </div> <!-- /#wrapper -->
+
+    <nav>
+       <span id="node-details"></span>
+    </nav>
  
     <script language="javascript">
 
@@ -127,12 +125,12 @@
       });
 
       $("#menu-toggle").click(function(e) {
-          e.preventDefault();
-          $("#wrapper").toggleClass("toggled");
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
       });
     
       $("#zoom-mode").click(function(e) {
-          zoom = ! zoom;
+        zoom = ! zoom;
       });
 
       /* Save positions */

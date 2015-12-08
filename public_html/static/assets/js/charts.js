@@ -25,6 +25,35 @@ var D3Force = function(nodes, links, div) {
                   'port': size['switch'],
                   'host': 5 * size['port']};
 
+  this.fadein_all = function() {
+    d3.selectAll(".node").attr("style", "opacity: 0.3");
+    d3.selectAll(".link-link").attr("style", "opacity: 0.3");
+  };
+
+  this.fadeout_all = function() {
+    d3.selectAll(".node").attr("style", "opacity: 1");
+    d3.selectAll(".link-link").attr("style", "opacity: 1");
+  };
+
+  this.highlight_switch = function(node) {
+    _this.fadein_all();
+    var d3node = d3.selectAll(".node.switch.switch-" + node.id.replace(/:/g, "\\\:"))[0][0];
+    d3node.setAttribute("style", "opacity: 1");
+    _this.show_node_details(node);
+  };
+
+  this.show_node_details = function(node) {
+    /* TODO: Maybe this function should not be here. */
+    $("nav").show();
+    clear_pannel_info();
+
+    if (node.type == "switch") {
+      getTemplateAjax('switch-details.handlebars', function(template) {
+       var context = node;
+       $('#node-details').html(template(context));
+      });
+    }
+  };
 
   this.load_layout = function() {
     show_msg("Loading previous layout saved from server...", "alert-info", 3000);
@@ -204,7 +233,7 @@ var D3Force = function(nodes, links, div) {
     .data(this.force.nodes())
     .enter().append("g")
     .attr("class", function(d) { return "node" + " " + d.type + " " + d.type + '-' + d.id;})
-//    .on("click", function(d) { console.log(d); })
+    .on("click", onclick)
 //    .on("mouseout", mouseout)
     .call(this.custom_drag);
 
@@ -216,6 +245,12 @@ var D3Force = function(nodes, links, div) {
         .attr("y2", function(d) { return d.target.y; });
     _this.node
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  }
+
+  function onclick() {
+    var element = d3.select(this);
+    var node = element[0][0].__data__;
+    _this.highlight_switch(node);
   }
 
   this.node.append("circle")
