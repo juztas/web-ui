@@ -4,19 +4,19 @@ This is a component of of-ng project. This component is responsible for display
 network topology in a GUI to users. Also control some basic operations like
 list, insert and remove flows.
 
-# Install
+## Install
 
 All the /api/ endpoint requests are redirected to a wsgi python app. Everything
 else are static files. But we host all ("/api/" endpoint and static files) under
 apache, in a virtualhost settings.
 
-## Installing Apache2
+### Installing Apache2
 
 ```
 $ sudo apt-get install apache2 libapache2-mod-wsgi
 ```
 
-## Downloading the source code
+### Downloading the source code
 
 ```
 $ sudo mkdir -p /var/www/ofng/
@@ -24,7 +24,7 @@ $ cd /var/www/ofng
 $ sudo git clone https://github.com/of-ng/web-ui.git
 ```
 
-## Create the Apache virtualhost
+### Create the Apache virtualhost
 
 Copy, or create a symlink of Apache config file to your apache default config
 dir:
@@ -35,7 +35,7 @@ $ sudo ln -s /var/www/ofng/web-ui/apache.conf /etc/apache2/sites-enabled/ofng.co
 
 Edit this file and change `yourdomain.com` to your webserver domain.
 
-## Install dependencies
+### Install dependencies
 
 ```
 $ sudo pip install -r web-ui/requirements.txt
