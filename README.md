@@ -41,6 +41,12 @@ Edit this file and change `yourdomain.com` to your webserver domain.
 $ sudo pip install -r web-ui/requirements.txt
 ```
 
+### Edit your config file
+
+Edit the file `web-ui/settings/production.py' and configure the variables
+properly.
+
+
 ## Restart apache
 
 ```
