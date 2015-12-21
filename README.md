@@ -52,3 +52,7 @@ properly.
 ```
 $ sudo service apache2 restart
 ```
+
+## Test it
+
+Point your browser to `http://ofng.yourdomain.com`.
