@@ -20,7 +20,7 @@ $ sudo apt-get install apache2 libapache2-mod-wsgi
 
 ```
 $ sudo mkdir -p /var/www/ofng/
-$ sudo cd /var/www/ofng
+$ cd /var/www/ofng
 $ sudo git clone https://github.com/of-ng/web-ui.git
 ```
 
@@ -38,7 +38,7 @@ Edit this file and change `yourdomain.com` to your webserver domain.
 ## Install dependencies
 
 ```
-$ sudo pip install -r requirements.txt
+$ sudo pip install -r web-ui/requirements.txt
 ```
 
 ## Restart apache
