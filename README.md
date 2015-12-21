@@ -10,8 +10,39 @@ All the /api/ endpoint requests are redirected to a wsgi python app. Everything
 else are static files. But we host all ("/api/" endpoint and static files) under
 apache, in a virtualhost settings.
 
-## Debian-Like
+## Installing Apache2
+
+```
+$ sudo apt-get install apache2 libapache2-mod-wsgi
+```
+
+## Downloading the source code
+
+```
+$ sudo mkdir -p /var/www/ofng/
+$ sudo cd /var/www/ofng
+$ sudo git clone https://github.com/of-ng/web-ui.git
+```
+
+## Create the Apache virtualhost
+
+Copy, or create a symlink of Apache config file to your apache default config
+dir:
+
+```
+$ sudo ln -s /var/www/ofng/web-ui/apache.conf /etc/apache2/sites-enabled/ofng.conf
+```
+
+Edit this file and change `yourdomain.com` to your webserver domain.
+
+## Install dependencies
 
 ```
 $ sudo pip install -r requirements.txt
+```
+
+## Restart apache
+
+```
+$ sudo service apache2 restart
 ```
