@@ -1,4 +1,4 @@
-# README
+# OpenFlow Next Generation - Web User Interface
 
 This is a component of of-ng project. This component is responsible for display
 network topology in a GUI to users. Also control some basic operations like
