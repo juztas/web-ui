@@ -1,3 +1,5 @@
 flask
 rrdtool
 Jinja2
+python-odl
+networkx
