@@ -22,6 +22,7 @@ $ sudo apt-get install apache2 libapache2-mod-wsgi
 $ sudo mkdir -p /var/www/ofng/
 $ cd /var/www/ofng
 $ sudo git clone https://github.com/of-ng/web-ui.git
+$ cd web-ui/
 ```
 
 ### Create the Apache virtualhost
@@ -38,12 +39,12 @@ Edit this file and change `yourdomain.com` to your webserver domain.
 ### Install dependencies
 
 ```
-$ sudo pip install -r web-ui/requirements.txt
+$ sudo pip install -r requirements.txt
 ```
 
 ### Edit your config file
 
-Edit the file `web-ui/settings/production.py` and configure the variables
+Edit the file `settings/production.py` and configure the variables
 properly.
 
 
