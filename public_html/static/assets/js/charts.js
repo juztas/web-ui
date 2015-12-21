@@ -33,6 +33,7 @@ var D3Force = function(nodes, links, div) {
   this.fadeout_all = function() {
     d3.selectAll(".node").attr("style", "opacity: 1");
     d3.selectAll(".link-link").attr("style", "opacity: 1");
+    $("nav").hide();
   };
 
   this.highlight_switch = function(node) {
@@ -40,6 +41,21 @@ var D3Force = function(nodes, links, div) {
     var d3node = d3.selectAll(".node.switch.switch-" + node.id.replace(/:/g, "\\\:"))[0][0];
     d3node.setAttribute("style", "opacity: 1");
     _this.show_node_details(node);
+  };
+
+  this.highlight_port = function(port) {
+    for (var key in _this.nodes) {
+      if (_this.nodes[key].type == "switch") {
+        connectors = _this.nodes[key].connectors;
+        if (connectors.hasOwnProperty(port.id)) {
+          _this.highlight_switch(_this.nodes[key]);
+          break;
+        }
+      }
+    }
+
+    var d3node = d3.selectAll(".node.port.port-" + port.id.replace(/:/g, "\\\:"))[0][0];
+    d3node.setAttribute("style", "opacity: 1");
   };
 
   this.show_node_details = function(node) {
@@ -165,6 +181,16 @@ var D3Force = function(nodes, links, div) {
     return found;
   };
 
+  this.get_all_hosts = function() {
+    var hosts = [];
+    for (var key in _this.nodes) {
+      if (_this.nodes[key].type == "host") {
+        hosts.push(_this.nodes[key]);
+      }
+    }
+    return hosts;
+  };
+
   // Compute the distinct nodes from the links.
   this.links.forEach(function(link) {
     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
@@ -200,8 +226,6 @@ var D3Force = function(nodes, links, div) {
       port.y += d3.event.dy;
       tick();
     }
-
-    // move ports also
     tick();
   }
 
@@ -219,8 +243,8 @@ var D3Force = function(nodes, links, div) {
   this.svg = d3.select(this.div).append("svg")
     .attr("width", this.width)
     .attr("height", this.height)
-//    .on("dblclick", hide_nav)
-//    .attr("pointer-events", "all")
+    .on("dblclick", this.fadeout_all)
+    .attr("pointer-events", "all")
 //    .call(d3.behavior.zoom().on("zoom", redraw))
   .append('svg:g');
 
@@ -250,7 +274,11 @@ var D3Force = function(nodes, links, div) {
   function onclick() {
     var element = d3.select(this);
     var node = element[0][0].__data__;
-    _this.highlight_switch(node);
+    if (node.type == "switch") {
+      _this.highlight_switch(node);
+    } else if (node.type == "port") {
+      _this.highlight_port(node);
+    }
   }
 
   this.node.append("circle")

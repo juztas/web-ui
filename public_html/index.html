@@ -39,9 +39,11 @@
       <!-- Sidebar -->
       <div id="sidebar-wrapper" class="sidebar sidebar-nav navbar-collapse">
         <ul class="nav">
+          <li class="active"><a href="/"><i class="fa fa-fw fa-th-list"></i> Topology</a></li>
           <li><a href="#" data-toggle="modal" data-target="#L2RouteCalculationModal"><i class="fa fa-fw fa-exchange"></i> L2 Route Calculation</a></li>
           <li><a href="#" data-toggle="modal" data-target="#L3RouteCalculationModal"><i class="fa fa-fw fa-exchange"></i> L3 Route Calculation</a></li>
-          <li><a href="/flows"><i class="fa fa-fw fa-th-list"></i> All Flows</a></li>
+          <li><a href="/interfaces.html"><i class="fa fa-fw fa-th-list"></i> All Interfaces</a></li>
+          <li><a href="/flows.html"><i class="fa fa-fw fa-th-list"></i> All Flows</a></li>
         </ul>
       </div><!-- /#sidebar-wrapper -->
   
@@ -92,12 +94,14 @@
                         <li><a id="change-port-label-name" href="#">Port Name</a></li>
                       </ul>
                     </div>
-
                   </div>
 
                 </div>
 
   	          <div id="graph"></div>
+              <div id="main"></div>
+              <div id="modals"></div>
+
               <div class="" id="alert" role="alert"></div>
          </div>
         </div> <!-- /.container-fluid -->
@@ -107,73 +111,266 @@
     <nav>
        <span id="node-details"></span>
     </nav>
- 
-    <script language="javascript">
 
+    <!-- Modal --> 
+    <div class="modal fade" id="L2RouteCalculationModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="generic-modal-title">Display routes between two nodes</h4>
+          </div>
+          <div class="modal-body" id="modal-msg">
+            <form id ="routeCalculationForm" action="#" method="POST" class="form-horizontal">
+              <div class="form-group">
+                <label for="source" class="col-sm-2 control-label">Source:</label>
+                <div class="col-sm-10">
+                <select id="l2source" name="source" class="form-control">
+                  <option>Choose a source host</option>
+                </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="destination" class="col-sm-2 control-label">Destination:</label>
+                <div class="col-sm-10">
+                <select id="l2destination" name="destination" class="form-control">
+                  <option>Choose a destination host</option>
+                </select>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <input type="button" id="L2RouteCalculationFormSubmit" class="btn btn-danger" value="Display routes">
+            </form> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="L3RouteCalculationModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="generic-modal-title">Display routes between two nodes</h4>
+          </div>
+    
+          <div class="modal-body" id="modal-msg">
+            <form id ="routeCalculationForm" action="#" method="POST" class="form-horizontal">
+    
+              <div class="form-group">
+                <label for="source" class="col-sm-2 control-label">Source:</label>
+                <div class="col-sm-10">
+    
+                <select id="l3source" name="source" class="form-control">
+                  <option>Choose a source host</option>
+                </select>
+                </div>
+              </div>
+    
+              <div class="form-group">
+                <label for="destination" class="col-sm-2 control-label">Destination:</label>
+                <div class="col-sm-10">
+                <select id="l3destination" name="destination" class="form-control">
+                  <option>Choose a destination host</option>
+                </select>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <input type="button" id="L3RouteCalculationFormSubmit" class="btn btn-danger" value="Display routes">
+            </form> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="PathFlowsConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="generic-modal-title">Are you sure about that?</h4>
+          </div>
+          <div class="modal-body" id="modal-msg">Do you wanna install flows on this path ?
+          </div>
+          <div class="modal-footer">
+            <form id="PathFlowsInstallForm" action="" method="POST">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+              <input id="type" type="hidden" value="">
+            </form> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="FlowRemoveModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="generic-modal-title">Are you sure about that?</h4>
+          </div>
+          <form id="RemoveFlowForm" action="" method="POST">
+          <div class="modal-body" id="modal-msg">This action is destructive. Are you sure that you want remove the flow <span id="flowid"></span>?
+    
+              <div class="form-group">
+    
+                <div class="checkbox">
+                  <label>
+                    <input id="delete_all" name="delete_all" type="checkbox"> Also, remove all flows in all nodes with name: <span id="flowname"></span>
+                  </label>
+                </div>
+              </div>
+    
+          </div>
+    
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+            </form> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="FlowLowPriorityRemoveModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="generic-modal-title">Are you sure about that?</h4>
+          </div>
+          <div class="modal-body" id="modal-msg">This action is destructive. Are you sure that you want remove the <strong>ALL</strong> flows with low priority?
+          </div>
+          <div class="modal-footer">
+            <form id="FlowLowPriorityRemoveForm" action="" method="POST">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+            </form> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+
+<div class="modal fade" id="FlowAddModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="generic-modal-title">Insert a new flow</h4>
+      </div>
+      <div class="modal-body" id="modal-msg">This is a simple flow insertion
+form. For now only one action is working (output to a port). Insert the flow
+information: <br><br>
+        <form id ="FlowAddForm" action="" method="POST" class="form-horizontal">
+          <div class="form-group">
+            <label for="node_id" class="col-sm-4 control-label">Node:</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" disabled id="node_id" placeholder="" value="blabla">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="name" class="col-sm-4 control-label">Name:</label>
+            <div class="col-sm-8">
+              <input type="text" name="name" class="form-control" id="name" value="" placeholder="Flow Name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="priority" class="col-sm-4 control-label">Priority:</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="priority" id="priority" placeholder="Flow Priority" value="100">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="priority" class="col-sm-4 control-label">Eth Type:</label>
+            <div class="col-sm-8">
+            <select id="eth_type" name="eth_type" class="form-control">
+              <option value="">Any</option>
+              <option value="2048">2048 (0x800) - IPv4</option>
+              <option value="2054">2054 (0x0806) - ARP</option>
+              <option value="35020">35020 (0x88cc) - LLDP</option>
+            </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eth_source" class="col-sm-4 control-label">Ethernet Source:</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="eth_source" id="eth_source" value="" placeholder="*">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eth_destination" class="col-sm-4 control-label">Ethernet Destination:</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="eth_destination" id="eth_destination" value="" placeholder="*">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eth_source" class="col-sm-4 control-label">IPv4 Source:</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ipv4_source" id="ipv4_source" value="" placeholder="*">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eth_destination" class="col-sm-4 control-label">IPv4 Destination:</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="ipv4_destination" id="ipv4_destination" value="" placeholder="*">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="Output" class="col-sm-4 control-label">Output to:</label>
+            <div class="col-sm-8">
+            <select id="output" name="output" class="form-control">
+            </select>
+            <small><i>For now, only output to a interface is allowed.</i></small>
+            </div>
+          </div>
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <input type="submit" class="btn btn-danger" value="Yes, I would like to add this flow">
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    <script language="javascript">
       $(document).ready(function() {
+
         $.ajax({
           type: "GET",
           url: "/api/topology",
           success: function (topology) {
+                    // Load main chart
                     chart = new D3Force(topology['nodes'],
                                         topology['links'],
                                         "#graph");
                     chart.load_layout();
-                   },  
+
+                   },
           dataType: "json"
         });
       });
+    </script>
 
-      $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-      });
-    
-      $("#zoom-mode").click(function(e) {
-        zoom = ! zoom;
-      });
+    <script src="/static/assets/js/events.js"></script>
 
-      /* Save positions */
-      d3.select('#save-layout').on('click', function() {
-        chart.save_layout()
-      });
-    
-      /* Restore positions */
-      d3.select('#load-layout').on('click', function() {
-        chart.load_layout();
-      });
-
-      /* switch labels */
-      d3.select('#change-switch-label-none').on('click', function() {
-        chart.clear_switch_labels();
-      });
-      d3.select('#change-switch-label-id').on('click', function() {
-        chart.show_switch_labels('id');
-      });
-      d3.select('#change-switch-label-description').on('click', function() {
-        chart.show_switch_labels('description');
-      });
-      d3.select('#change-switch-label-address').on('click', function() {
-        chart.show_switch_labels('ip_address');
-      });
-      d3.select('#change-switch-label-manufacturer').on('click', function() {
-        chart.show_switch_labels('manufacturer');
-      });
-
-      /* port labels */
-      d3.select('#change-port-label-none').on('click', function() {
-        chart.clear_port_labels();
-      });
-      d3.select('#change-port-label-number').on('click', function() {
-        chart.show_port_labels('port_number');
-      });
-      d3.select('#change-port-label-name').on('click', function() {
-        chart.show_port_labels('name');
-      });
-      d3.select("#unused-ports-toggle").on('click', function() {
-        chart.toggle_unused_ports();
-      });
-
-    </script> 
   </body>
 </html>

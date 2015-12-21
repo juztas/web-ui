@@ -52,3 +52,41 @@ path.link {
   stroke: #666;
   stroke-width: 1.5px;
 }
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #444;
+  shape-rendering: crispEdges;
+}
+
+.y {
+  color: white;
+}
+
+.line {
+  stroke: LightSkyBlue;
+}
+
+.line2 {
+  stroke: lightgreen;
+}
+
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.area {
+  fill: steelblue;
+  opacity: 0.4;
+}
+
+.main-flow-details {
+  border-left: 10px solid LightSkyBlue;
+  margin-left: 100px;
+}
+
+.oposite-flow-details {
+  border-left: 10px solid lightgreen;
+}
