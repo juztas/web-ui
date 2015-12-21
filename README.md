@@ -43,7 +43,7 @@ $ sudo pip install -r web-ui/requirements.txt
 
 ### Edit your config file
 
-Edit the file `web-ui/settings/production.py' and configure the variables
+Edit the file `web-ui/settings/production.py` and configure the variables
 properly.
 
 
@@ -56,3 +56,10 @@ $ sudo service apache2 restart
 ## Test it
 
 Point your browser to `http://ofng.yourdomain.com`.
+
+## Authors
+
+This is a collaborative project between SPRACE (From São Paulo State University
+- Unesp) and Caltech (California Institute of Technology).
+
+For a complete list of people, please see the AUTHORS.md file.
