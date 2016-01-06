@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+    ServerName ofng.yourdomain.com
+    ServerAlias ofng.yourdomain.com
+    ServerAdmin admin@yourdomain.com
+
+    WSGIDaemonProcess ofng-webui user=apache  group=apache threads=5
+    WSGIScriptAlias /api /var/www/ofng/web-ui/apache.wsgi
+    <Directory /var/www/ofng/web-ui>
+        WSGIProcessGroup ofng-webui
+        WSGIApplicationGroup %{GLOBAL}
+        WSGIScriptReloading On
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    DocumentRoot /var/www/ofng/web-ui/public_html/
+    <Directory /var/www/ofng/web-ui/public_html/>
+      Order allow,deny
+      Allow from all
+    </Directory>
+
+    ErrorLog logs/error_log
+    LogLevel warn
+    CustomLog logs/access.log combined
+</VirtualHost>
