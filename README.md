@@ -10,7 +10,7 @@ Please, refer to INSTALL.debian for detailed instructions to install in Debian b
 
 ## Authors
 
-This is a collaborative project between SPRACE (From São Paulo State University
-- Unesp) and Caltech (California Institute of Technology).
+This is a collaborative project between SPRACE (From São Paulo State University 
+\- Unesp) and Caltech (California Institute of Technology).
 
 For a complete list of people, please see the AUTHORS.md file.

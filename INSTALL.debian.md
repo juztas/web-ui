@@ -53,6 +53,6 @@ Point your browser to `http://ofng.yourdomain.com`.
 ## Authors
 
 This is a collaborative project between SPRACE (From São Paulo State University
-- Unesp) and Caltech (California Institute of Technology).
+\- Unesp) and Caltech (California Institute of Technology).
 
 For a complete list of people, please see the AUTHORS.md file.
