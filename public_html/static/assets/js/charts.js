@@ -28,13 +28,13 @@ var D3Force = function(nodes, links, div) {
                   'host': 5 * size['port']};
 
   this.fadein_all = function() {
-    d3.selectAll(".node").attr("style", "opacity: 0.3");
-    d3.selectAll(".link-link").attr("style", "opacity: 0.3");
+    d3.selectAll(".node").style("opacity", "0.3");
+    d3.selectAll(".link-link").style("opacity", "0.3");
   };
 
   this.fadeout_all = function() {
-    d3.selectAll(".node").attr("style", "opacity: 1");
-    d3.selectAll(".link-link").attr("style", "opacity: 1");
+    d3.selectAll(".node").style("opacity", "1");
+    d3.selectAll(".link-link").style("opacity", "1");
     $("nav").hide();
   };
 
