@@ -9,10 +9,12 @@ var D3Force = function(nodes, links, div) {
 
   // Nodes vars
   var charge = {'switch': 200,
+                'ovs': 200,
                 'host': 20,
                 'port': -20};
 
   var size = {'switch': 50,
+              'ovs': 50,
               'host': 20,
               'port': 15};
 
@@ -38,14 +40,15 @@ var D3Force = function(nodes, links, div) {
 
   this.highlight_switch = function(node) {
     _this.fadein_all();
-    var d3node = d3.selectAll(".node.switch.switch-" + node.id.replace(/:/g, "\\\:"))[0][0];
+      var d3node = d3.selectAll(".node.switch.switch-" + node.id.replace(/:/g, "\\\:") + ", .node.ovs.ovs-" + node.id.replace(/:/g, "\\\:"))[0][0];
     d3node.setAttribute("style", "opacity: 1");
     _this.show_node_details(node);
   };
 
   this.highlight_port = function(port) {
     for (var key in _this.nodes) {
-      if (_this.nodes[key].type == "switch") {
+        if (_this.nodes[key].type == "switch" ||
+            _this.nodes[key].type == "ovs") {
         connectors = _this.nodes[key].connectors;
         if (connectors.hasOwnProperty(port.id)) {
           _this.highlight_switch(_this.nodes[key]);
@@ -63,7 +66,7 @@ var D3Force = function(nodes, links, div) {
     $("nav").show();
     clear_pannel_info();
 
-    if (node.type == "switch") {
+    if (node.type == "switch" || node.type == "ovs") {
       getTemplateAjax('switch-details.handlebars', function(template) {
        var context = node;
        $('#node-details').html(template(context));
@@ -116,7 +119,7 @@ var D3Force = function(nodes, links, div) {
   this.show_switch_labels = function(type) {
     _this.clear_switch_labels();
 
-    var switches = d3.selectAll(".node.switch");
+    var switches = d3.selectAll(".node.switch, .node.ovs");
     switches.append("text")
       .attr("x", 0)
       .attr("dy", ".35em")
@@ -201,7 +204,7 @@ var D3Force = function(nodes, links, div) {
      .nodes(d3.values(this.nodes))
      .links(this.links)
      .size([this.width, this.height])
-     .gravity(0.015)
+     // .gravity(0.015)
      .linkStrength(function(d) { return strength[d.type]; })
      .linkDistance(function(d) { return distance[d.type]; })
      .charge(function(d) { return charge[d.type]; })
@@ -251,7 +254,7 @@ var D3Force = function(nodes, links, div) {
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
     .enter().append("line")
-    .attr("class", function(d) { return d.type + "-link"; });
+    .attr("class", function(d) { return d.type + "-link" + " " + d.capacity + "-link"; });
 
   this.node = this.svg.selectAll(".node")
     .data(this.force.nodes())
@@ -274,7 +277,7 @@ var D3Force = function(nodes, links, div) {
   function onclick() {
     var element = d3.select(this);
     var node = element[0][0].__data__;
-    if (node.type == "switch") {
+      if (node.type == "switch" || node.type == "ovs") {
       _this.highlight_switch(node);
     } else if (node.type == "port") {
       _this.highlight_port(node);

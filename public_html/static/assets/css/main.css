@@ -47,11 +47,13 @@ a.nav-expander.fixed {
 nav {
   background: #2d2f33;
   display: none;
-  height: 360px;
+  /* height: 360px; */
+  max-height: 300px;
   overflow: auto;
   position: fixed;
   font-size: 12px;
-  top: 70%;
+  /* top: 70%; */
+  bottom: 0;
   width: 100%;
   z-index: 2000;
   transition: right 0.3s ease-in-out 0s;

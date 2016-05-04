@@ -74,9 +74,8 @@
 
     <div class="row">
       <div class="col-md-12 text-right">
-       <br/><br/>
-       <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#FlowAddModal" data-node="{{id}}"><i class="fa fa-plus"></i> Add a new flow</a>
-       <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#FlowLowPriorityRemoveModal" data-node="{{id}}"><i class="fa fa-trash"></i> Remove low priority flows</a>
+        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#FlowAddModal" data-node="{{id}}"><i class="fa fa-plus"></i> Add a new flow</a>
+        <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#FlowLowPriorityRemoveModal" data-node="{{id}}"><i class="fa fa-trash"></i> Remove low priority flows</a>
       </div>
     </div>
   </div>
@@ -108,7 +107,7 @@
                 </thead>
                 <tbody>
                   {{#each connectors}}
-                  <tr class={{class}}>
+                  <tr class="{{class}}">
                     <td>{{id}}</td>
                     <td>{{name}}</td>
                     <td>{{port_number}}</td>
@@ -142,7 +141,7 @@
                 <tbody>
                   {{#each tables}}
                   {{#each flows}}
-                  <tr class={{class}}>
+                  <tr class="{{class}}">
                   <td>
 {{#active}}
 <i class="fa fa-fw fa-check" style="color: green;" title="This is a active flow.

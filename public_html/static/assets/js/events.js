@@ -33,6 +33,9 @@ d3.select('#change-switch-label-address').on('click', function() {
 d3.select('#change-switch-label-manufacturer').on('click', function() {
   chart.show_switch_labels('manufacturer');
 }); 
+d3.select('#change-switch-label-hardware').on('click', function() {
+    chart.show_switch_labels('hardware');
+}); 
 
 /* port labels */
 d3.select('#change-port-label-none').on('click', function() {

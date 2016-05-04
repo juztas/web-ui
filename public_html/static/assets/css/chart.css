@@ -1,12 +1,12 @@
 .link-link {
   fill: none;
-  stroke: #999;
+/*  stroke: #999; */
   stroke-width: 6.5px;
 }
 
 .host-link {
   fill: none;
-  stroke: #999;
+/*  stroke: #999; */
   stroke-width: 6.5px;
 }
 
@@ -16,8 +16,30 @@
   stroke-width: 0px;
 }
 
+.internal-link {
+  /* Nothing */
+}
+
+.ten-ge-link {
+  stroke: #999
+}
+
+.forty-ge-link {
+  stroke: purple
+}
+
+.hundred-ge-link {
+  stroke: green
+}
+
 .switch-circle {
   fill: #000;
+  stroke: #B94431;
+  stroke-width: 3.5px;
+}
+
+.ovs-circle {
+  fill: #B94431;
   stroke: #B94431;
   stroke-width: 3.5px;
 }
@@ -39,7 +61,8 @@ node {
   position: absolute;
 }
 
-.switch text {
+.switch text,
+.ovs text {
   font-size: 12px;
 }
 
