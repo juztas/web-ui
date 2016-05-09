@@ -45,9 +45,9 @@
 }
 
 .host-circle {
-  fill: red;
-  stroke: #B94431;
-  stroke-width: 3.5px;
+  /* fill: red; */
+  /* stroke: #B94431; */
+  /* stroke-width: 3.5px; */
 }
 
 .port-circle {

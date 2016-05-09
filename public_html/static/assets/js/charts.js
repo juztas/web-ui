@@ -289,6 +289,15 @@ var D3Force = function(nodes, links, div) {
     .attr("class", function(d) { return d['type'] + "-circle";})
     .attr("r", function(d) { return size[d.type]; });
 
+  d3.selectAll(".host")
+    .append("text")
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'central')
+    .attr('font-family', 'FontAwesome')
+    .attr('font-size', function(d) { return 2*size[d.type]; } )
+    .style('fill', 'white')
+    .text(function(d){ return '\uf233'; });
+
 
   this.show_switch_labels("ip_address");
   this.show_port_labels("port_number");
