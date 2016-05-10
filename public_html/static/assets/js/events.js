@@ -4,7 +4,12 @@ $("#menu-toggle").click(function(e) {
 }); 
     
 $("#zoom-mode").click(function(e) {
-  zoom = ! zoom;
+  chart.zoom = ! chart.zoom;
+  if (chart.zoom) {
+    $('#zoom-mode').addClass('active');
+  } else {
+    $('#zoom-mode').removeClass('active');
+  }
 }); 
 
 /* Save positions */

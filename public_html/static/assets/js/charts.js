@@ -3,7 +3,8 @@ var D3Force = function(nodes, links, div) {
   this.links = links;
   this.div = div;
   this.width = $(div).parent().width();
-  this.height = 800;
+  this.height = $(window).height();
+  this.zoom = true;
 
   var _this = this;
 
@@ -26,6 +27,8 @@ var D3Force = function(nodes, links, div) {
   var distance = {'link': 6 * size['switch'],
                   'port': size['switch'],
                   'host': 5 * size['port']};
+
+  var tick_times = 100;
 
   this.fadein_all = function() {
     d3.selectAll(".node").style("opacity", "0.3");
@@ -255,6 +258,7 @@ var D3Force = function(nodes, links, div) {
      .start();
 
   this.dragstart = function(d, i) {
+    d3.event.sourceEvent.stopPropagation();
     _this.force.stop();
   };
 
@@ -270,9 +274,9 @@ var D3Force = function(nodes, links, div) {
       port.py += d3.event.dy;
       port.x += d3.event.dx;
       port.y += d3.event.dy;
-      tick();
+      // tick();
     }
-    tick();
+    // tick();
   };
 
   this.dragend = function(d, i) {
@@ -291,8 +295,9 @@ var D3Force = function(nodes, links, div) {
     .attr("height", this.height)
     .on("dblclick", this.fadeout_all)
     .attr("pointer-events", "all")
-//    .call(d3.behavior.zoom().on("zoom", redraw))
-  .append('svg:g');
+    .call(d3.behavior.zoom().on("zoom", rescale))
+    .on("dblclick.zoom", null)
+    .append('svg:g');
 
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
@@ -329,6 +334,23 @@ var D3Force = function(nodes, links, div) {
     }
   }
 
+  function rescale() {
+    if (_this.zoom)
+      _this.svg
+        .attr("transform", "translate(" + d3.event.translate + ")"
+              + " scale(" + d3.event.scale + ")");
+  }
+
+  d3.select(window).on("resize", resize);
+
+  function resize() {
+    _this.width = $(_this.div).parent().width();
+    _this.height = $(_this.div).parent().height();
+    _this.svg.attr("width", _this.width).attr("height", _this.height);
+    $(_this.svg).parent().attr("width", _this.width).attr("height", _this.height);
+    _this.force.size([_this.width, _this.height]).resume();
+  }
+
   this.node.append("circle")
     .attr('pointer-events', 'all')
     .attr("class", function(d) { return d['type'] + "-circle";})
@@ -343,6 +365,8 @@ var D3Force = function(nodes, links, div) {
     .style('fill', 'white')
     .text(function(d){ return '\uf233'; });
 
+  for (var i = tick_times; i > 0; --i) this.force.tick();
+  this.force.stop();
 
   this.show_switch_labels("ip_address");
   this.show_port_labels("port_number");
