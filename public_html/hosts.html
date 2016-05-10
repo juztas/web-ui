@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-  
+
     <title>OpenFlow Next Generation Project - Web GUI</title>
-  
+
     <!-- CSS -->
     <link type="text/css" href="/static/assets/css/font-awesome.min.css" rel="stylesheet">
     <link type="text/css" href="/static/assets/css/bootstrap.min.css" rel="stylesheet">
 
     <link type="text/css" href="/static/assets/css/main.css" rel="stylesheet">
     <link type="text/css" href="/static/assets/css/jquery.dataTables.min.css" rel="stylesheet">
-  
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -32,7 +32,7 @@
     <script src="/static/assets/js/handlebars.min-latest.js"></script>
 
     <script src="/static/assets/js/main.js"></script>
-  
+
     <div id="wrapper">
       <!-- Page Content -->
       <div id="page-content-wrapper">
@@ -44,8 +44,23 @@
       </div> <!-- /#page-content-wrapper -->
     </div> <!-- /#wrapper -->
 
+    <!-- Waiting progess dialog -->
+    <div class="modal modal-dialog" id="waiting-dialog" style="margin-top: 200px;" data-backdrop="static" data-keyboard="false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="generic-modal-title">Wait for Processing...</h4>
+        </div>
+        <div class="modal-body">
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped active" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script language="javascript">
       $(document).ready(function() {
+        $('#waiting-dialog').modal();
         $.ajax({
           type: "GET",
           url: "/api/topology",
@@ -71,20 +86,21 @@
               }
             }
             getTemplateAjax('hosts.handlebars', function(template) {
-               var context = {'host': hosts};
-               $('#main').html(template(context));
-               $('#hostsTable').DataTable({
-                 'pageLength': 100
-               });
-            }); 
+              var context = {'host': hosts};
+              $('#main').html(template(context));
+              $('#hostsTable').DataTable({
+                'pageLength': 100
+              });
+              $('#waiting-dialog').modal('hide');
+            });
 
-          },  
+          },
           dataType: "json"
         });
       });
     </script>
 
     <script src="/static/assets/js/events.js"></script>
-  
+
   </body>
 </html>
