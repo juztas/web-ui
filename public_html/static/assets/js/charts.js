@@ -61,6 +61,13 @@ var D3Force = function(nodes, links, div) {
     d3node.setAttribute("style", "opacity: 1");
   };
 
+  this.highlight_host = function(node) {
+    _this.fadein_all();
+    var d3node = d3.selectAll(".node.host.host-" + node.id.replace(/:/g, "\\\:"))[0][0];
+    d3node.setAttribute("style", "opacity: 1");
+    _this.show_node_details(node);
+  };
+
   this.show_node_details = function(node) {
     /* TODO: Maybe this function should not be here. */
     $("nav").show();
@@ -68,8 +75,26 @@ var D3Force = function(nodes, links, div) {
 
     if (node.type == "switch" || node.type == "ovs") {
       getTemplateAjax('switch-details.handlebars', function(template) {
-       var context = node;
-       $('#node-details').html(template(context));
+        var context = node;
+        $('#node-details').html(template(context));
+      });
+    } else if (node.type == "host") {
+      getTemplateAjax('host-details.handlebars', function(template) {
+        var address = node['host-tracker-service:addresses'][0];
+        var attachment_point = node['host-tracker-service:attachment-points'][0];
+        var attachment_split = attachment_point['tp-id'].split(':');
+        var attachment_port = attachment_split.pop();
+        var attachment_switch = attachment_split.join(':');
+        var context = {
+          'id': address.id,
+          'name': node.id,
+          'ip': address.ip,
+          'mac': address.mac,
+          'active': attachment_point.active,
+          'attachment_port': attachment_port,
+          'attachment_switch': attachment_switch
+        };
+        $('#node-details').html(template(context));
       });
     }
   };
@@ -102,7 +127,7 @@ var D3Force = function(nodes, links, div) {
     d3.selectAll(".node").each(function (d) {
        positions[d.id] = [d.x, d.y];
     });
-  
+
     // Remote Store
     $.ajax({
       type: "POST",
@@ -114,7 +139,7 @@ var D3Force = function(nodes, links, div) {
       },
       dataType: "json"
     });
-  }
+  };
 
   this.show_switch_labels = function(type) {
     _this.clear_switch_labels();
@@ -149,6 +174,24 @@ var D3Force = function(nodes, links, div) {
 
   this.clear_port_labels = function() {
     var labels = d3.selectAll(".port-label");
+    labels.remove();
+  };
+
+  this.show_host_labels = function(type) {
+    _this.clear_host_labels();
+
+    var hosts = d3.selectAll(".host");
+    hosts.append("text")
+      .attr("x", 0)
+      .attr("dy", "2em")
+      .style("fill", "white")
+      .attr("class", "host-label")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d['host-tracker-service:addresses'][0][type]; });
+  };
+
+  this.clear_host_labels = function() {
+    var labels = d3.selectAll(".host-label");
     labels.remove();
   };
 
@@ -213,7 +256,7 @@ var D3Force = function(nodes, links, div) {
 
   this.dragstart = function(d, i) {
     _this.force.stop();
-  }
+  };
 
   this.dragmove = function(d, i) {
     d.px += d3.event.dx;
@@ -230,13 +273,13 @@ var D3Force = function(nodes, links, div) {
       tick();
     }
     tick();
-  }
+  };
 
   this.dragend = function(d, i) {
     d.fixed = true;
     tick();
     _this.force.resume();
-  }
+  };
 
   this.custom_drag = d3.behavior.drag()
                 .on("dragstart", this.dragstart)
@@ -281,6 +324,8 @@ var D3Force = function(nodes, links, div) {
       _this.highlight_switch(node);
     } else if (node.type == "port") {
       _this.highlight_port(node);
+    } else if (node.type == "host") {
+      _this.highlight_host(node);
     }
   }
 
@@ -301,4 +346,5 @@ var D3Force = function(nodes, links, div) {
 
   this.show_switch_labels("ip_address");
   this.show_port_labels("port_number");
-}
+  this.show_host_labels("ip");
+};

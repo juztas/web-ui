@@ -51,6 +51,17 @@ d3.select("#unused-ports-toggle").on('click', function() {
   chart.toggle_unused_ports();
 });
 
+/* host labels */
+d3.select('#change-host-label-id').on('click', function() {
+  chart.show_host_labels('id');
+});
+d3.select('#change-host-label-ip').on('click', function() {
+    chart.show_host_labels('ip');
+});
+d3.select('#change-host-label-mac').on('click', function() {
+  chart.show_host_labels('mac');
+});
+
 $('#L2RouteCalculationModal').on('show.bs.modal', function (event) {
   var modal = $(this);
   var source = modal.find("#l2source")[0];
