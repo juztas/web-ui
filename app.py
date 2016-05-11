@@ -11,6 +11,7 @@ import datetime
 from settings.production import *
 
 from odl.instance import ODLInstance
+from odl.altospce import ALTOSpce
 from odl.exceptions import NodeNotFound, TableNotFound, FlowNotFound
 
 from networkx import nx
@@ -360,6 +361,45 @@ def install_flows_for_l3path(path_id):
     # Update Json file
     return flask.redirect("/")
 
+@app.route('/spce/path/setup', methods=['POST'])
+def spce_setup_path():
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    source = data['source']
+    destination = data['destination']
+    obj_metrics = data['obj_metrics']
+    constraints = data['constraints']
+
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    spce = ALTOSpce(odl)
+
+    try:
+        return flask.jsonify(spce.path_setup(src=source_ip,
+                               dst=target_ip,
+                               objective_metrics=obj_metrics,
+                               constraint_metric=constraints))
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Setup path failed"
+        flask.abort(500)
+
+@app.route('/spce/tc/set', methods=['POST'])
+def spce_set_tc():
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    source = data['source']
+    destination = data['destination']
+    bandwidth = data['bandwidth']
+    bs = data['bs']
+
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    spce = ALTOSpce(odl)
+
+    try:
+        return flask.jsonify(spce.set_tc(src=source_ip, dst=target_ip, bd=bandwidth, bs=bs))
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Rate limiting setup failed"
+        flask.abort(500)
+
 @app.route('/flow/<node_id>/<table_id>/delete/low', methods=['POST', 'DELETE'])
 def delete_low_priority_flows(node_id, table_id):
     credentials = (odl_user, odl_pass)
@@ -386,7 +426,7 @@ def delete_flow(node_id, table_id, flow_id):
         # Get the table object
         table = node.get_table_by_id(table_id)
         # Get the flow
-        flow = table.get_flow_by_id(flow_id)
+        flow = table.get_all_flows()[flow_id]
     except (NodeNotFound, TableNotFound, FlowNotFound) as e:
         flask.abort(404)
 

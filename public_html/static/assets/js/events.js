@@ -123,7 +123,7 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
 
 });
 
-$('#L3RouteCalculationModal').on('show.bs.modal', function (event) {
+$('#L3RouteCalculationModal, #SPCEPathManagerModal, #SPCERateControllerModal').on('show.bs.modal', function (event) {
   var modal = $(this);
   var source = modal.find("#l3source")[0];
   var destination = modal.find("#l3destination")[0];
@@ -189,6 +189,60 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
     dataType: "json"
   });
 
+});
+
+$("#SPCESetupPathFormSubmit").click(function(e) {
+    var modal = $("#SPCEPathManagerModal");
+    var source = modal.find("#l3source")[0]['value'];
+    var destination = modal.find("#l3destination")[0]['value'];
+    var obj_metrics = [modal.find("#obj-metrics")[0]['value']];
+    var constraints = [{'metric': 'hopcount',
+                        'min': modal.find("#min-hopcount").val() | "0",
+                        'max': modal.find("#max-hopcount").val() | "100000000000"},
+                       {'metric': 'bandwidth',
+                        'min': modal.find("#min-bandwidth").val() | "0",
+                        'max': modal.find("#max-bandwidth").val() | "100000000000"}];
+    // Test Input
+    alert(JSON.stringify({'source': source,
+                          'destination': destination,
+                          'obj_metrics': obj_metrics,
+                          'constraints': constraints}));
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "api/spce/path/setup",
+        data: JSON.stringify({'source': source,
+                              'destination': destination,
+                              'obj_metrics': obj_metrics,
+                              'constraints': constraints}),
+        success: function (data) {
+            alert(JSON.stringify(data));
+        },
+        dataType: "json"
+    });
+});
+
+$("#SPCERateLimitingFormSubmit").click(function(e) {
+    var modal = $("#SPCERateControllerModal");
+    var source = modal.find("#l3source")[0]['value'];
+    var destination = modal.find("#l3destination")[0]['value'];
+    var bandwidth = modal.find("#rate-limit").val();
+    var bs = modal.find("#burst-size").val() | "200";
+    // Test Input
+    alert("source: " + source + ", destination: " + destination);
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "api/spce/tc/set",
+        data: JSON.stringify({'source': source,
+                              'destination': destination,
+                              'bandwidth': bandwidth,
+                              'bs': bs}),
+        success: function (data) {
+            alert(JSON.stringify(data));
+        },
+        dataType: "json"
+    });
 });
 
 $('#PathFlowsConfirmationModal').on('show.bs.modal', function (event) {
