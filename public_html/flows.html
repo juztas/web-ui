@@ -69,7 +69,7 @@
 
             var switches = {}
             for (var k in nodes) {
-              if (nodes[k].type == "switch") {
+              if (nodes[k].type == "switch" || nodes[k].type == "ovs") {
                 switches[k] = nodes[k];
               }
             }

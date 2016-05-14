@@ -1,8 +1,8 @@
 function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      results = regex.exec(location.search);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 function show_msg(msg, type, timeout) {
@@ -16,7 +16,7 @@ function show_msg(msg, type, timeout) {
 
   window.setTimeout(function() {
     $("#alert").fadeTo(500, 0).slideUp(500, function(){
-        $("#alert").hide();
+      $("#alert").hide();
     });
   }, timeout);
 }
@@ -54,6 +54,38 @@ function display_paths(source, destination, paths) {
   });
 }
 
+function alto_path_manager(paths) {
+  $("nav").show();
+  clear_pannel_info();
+
+  getTemplateAjax('alto-route-management.handlebars', function(template) {
+
+    // Test part
+    paths.push({path: ['src_host1', 'node1', 'node2', 'node3', 'node4', 'node5', 'dest_host2'], tc: 10000000});
+    paths.push({path: ['src_host0', 'node9', 'node8', 'node3', 'node4', 'node6', 'dest_host5']});
+    paths.push({path: ['src_host3', 'node7', 'node8', 'node3', 'node4', 'node6', 'dest_host4'], tc: 40000000});
+
+    var context = {paths: paths};
+    $('#node-details').html(template(context));
+
+    $(".tc-update, .tc-create").click(function(e) {
+      var spans = $(this).parent().prev().prev().children();
+      var source_ip = spans.first().text();
+      var destination_ip = spans.last().text();
+      var modal = $("#SPCERateControllerModal");
+      var source = modal.find("#l3source").text(source_ip);
+      var destination = modal.find("#l3destination").text(destination_ip);
+      if ($(this).attr("class").indexOf("update") > 0) {
+        modal.find("#ALTORateControllerForm").attr("action", "update");
+      } else {
+        modal.find("#ALTORateControllerForm").attr("action", "create");
+      }
+
+      modal.modal();
+    });
+  });
+}
+
 function plot_flow(clean_flow_id, table_id, node_id) {
   clear_pannel_info();
 
@@ -62,40 +94,40 @@ function plot_flow(clean_flow_id, table_id, node_id) {
     cache: false,
     success: function(data) {
       console.log(data);
-/*
-      var flow_id = Object.keys(data)[0];
-      var flow = data[flow_id];
-      getTemplateAjax('/static/assets/templates/flow-details.handlebars', function(template) {
-        var context = {flow: flow};
+      /*
+       var flow_id = Object.keys(data)[0];
+       var flow = data[flow_id];
+       getTemplateAjax('/static/assets/templates/flow-details.handlebars', function(template) {
+       var context = {flow: flow};
        $('#flow-details-handlebars').html(template(context));
-      }); 
-*/
-    },  
-  }); 
+       });
+       */
+    },
+  });
 
-/*
-  node = get_node_details(node_id);
-  table = node[node_id]['tables'][table_id][0];
-  operational = table['operational_flows'];
-  flow_details = null;
-  operational.forEach(function(op) {
-    key = Object.keys(op)[0];
-    if (op[key]['clean_id'] == clean_flow_id) {
-      flow_details = op[key];
-      flow_details['node_id'] = node_id;
-    }   
-  }); 
+  /*
+   node = get_node_details(node_id);
+   table = node[node_id]['tables'][table_id][0];
+   operational = table['operational_flows'];
+   flow_details = null;
+   operational.forEach(function(op) {
+   key = Object.keys(op)[0];
+   if (op[key]['clean_id'] == clean_flow_id) {
+   flow_details = op[key];
+   flow_details['node_id'] = node_id;
+   }
+   });
 
-  var source = $("#plot-flow-template").html();
-  var context = {flow: flow_details};
+   var source = $("#plot-flow-template").html();
+   var context = {flow: flow_details};
 
-  
-  var template = Handlebars.compile($.trim(source));
-  var html = template(context);
-  $("#node-details").html(html);
-*/
+
+   var template = Handlebars.compile($.trim(source));
+   var html = template(context);
+   $("#node-details").html(html);
+   */
 }
 
 Handlebars.registerHelper("len", function(json) {
-    return Object.keys(json).length;
+  return Object.keys(json).length;
 });

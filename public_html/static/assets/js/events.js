@@ -1,8 +1,8 @@
 $("#menu-toggle").click(function(e) {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
-}); 
-    
+});
+
 $("#zoom-mode").click(function(e) {
   chart.zoom = ! chart.zoom;
   if (chart.zoom) {
@@ -10,48 +10,48 @@ $("#zoom-mode").click(function(e) {
   } else {
     $('#zoom-mode').removeClass('active');
   }
-}); 
+});
 
 /* Save positions */
 d3.select('#save-layout').on('click', function() {
   chart.save_layout()
-}); 
-    
+});
+
 /* Restore positions */
 d3.select('#load-layout').on('click', function() {
   chart.load_layout();
-}); 
+});
 
 /* switch labels */
 d3.select('#change-switch-label-none').on('click', function() {
   chart.clear_switch_labels();
-}); 
+});
 d3.select('#change-switch-label-id').on('click', function() {
   chart.show_switch_labels('id');
-}); 
+});
 d3.select('#change-switch-label-description').on('click', function() {
   chart.show_switch_labels('description');
-}); 
+});
 d3.select('#change-switch-label-address').on('click', function() {
   chart.show_switch_labels('ip_address');
-}); 
+});
 d3.select('#change-switch-label-manufacturer').on('click', function() {
   chart.show_switch_labels('manufacturer');
-}); 
+});
 d3.select('#change-switch-label-hardware').on('click', function() {
     chart.show_switch_labels('hardware');
-}); 
+});
 
 /* port labels */
 d3.select('#change-port-label-none').on('click', function() {
   chart.clear_port_labels();
-}); 
+});
 d3.select('#change-port-label-number').on('click', function() {
   chart.show_port_labels('port_number');
-}); 
+});
 d3.select('#change-port-label-name').on('click', function() {
   chart.show_port_labels('name');
-}); 
+});
 d3.select("#unused-ports-toggle").on('click', function() {
   chart.toggle_unused_ports();
 });
@@ -123,7 +123,7 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
 
 });
 
-$('#L3RouteCalculationModal, #SPCEPathManagerModal, #SPCERateControllerModal').on('show.bs.modal', function (event) {
+$('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', function (event) {
   var modal = $(this);
   var source = modal.find("#l3source")[0];
   var destination = modal.find("#l3destination")[0];
@@ -191,58 +191,115 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
 
 });
 
+$("#ALTORouteManagementTab").click(function(e) {
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: "api/spce/path/retrieve",
+    data: JSON.stringify({}),
+    success: function (data) {
+      alto_path_manager(data['paths']);
+    },
+    dataType: "json"
+  });
+});
+
+$("#ALTORouteRemoveModal").on("show.bs.modal", function (event) {
+  var button = $(event.relatedTarget);
+  var route = button.data('route');
+  var modal = $(this);
+  modal.find("#route").text(route.replace(/,/g, '|'));
+});
+
+$("#ALTORateRemoveModal").on("show.bs.modal", function (event) {
+  var button = $(event.relatedTarget).parent().siblings()
+        .first().children().first();
+  var route = button.data('route');
+  var modal = $(this);
+  modal.find("#route").text(route.replace(/,/g, '|'));
+});
+
+$("#ALTORemoveRouteFormSubmit").click(function (e) {
+  var form = $(this).parent().parent();
+  var route = form.find("#route").text();
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: "api/spce/path/remove",
+    data: JSON.stringify({'path': route}),
+    success: function (data) {
+      $("#ALTORouteManagementTab").click();
+    }
+  });
+});
+
 $("#SPCESetupPathFormSubmit").click(function(e) {
-    var modal = $("#SPCEPathManagerModal");
-    var source = modal.find("#l3source")[0]['value'];
-    var destination = modal.find("#l3destination")[0]['value'];
-    var obj_metrics = [modal.find("#obj-metrics")[0]['value']];
-    var constraints = [{'metric': 'hopcount',
-                        'min': modal.find("#min-hopcount").val() | "0",
-                        'max': modal.find("#max-hopcount").val() | "100000000000"},
-                       {'metric': 'bandwidth',
-                        'min': modal.find("#min-bandwidth").val() | "0",
-                        'max': modal.find("#max-bandwidth").val() | "100000000000"}];
-    // Test Input
-    alert(JSON.stringify({'source': source,
+  var modal = $("#ALTORouteCalculationModal");
+  var source = modal.find("#l3source").val();
+  var destination = modal.find("#l3destination").val();
+  var obj_metrics = [modal.find("#obj-metrics").val()];
+  var constraints = [{'metric': 'hopcount',
+                      'min': parseInt(modal.find("#min-hopcount").val()) || 0,
+                      'max': parseInt(modal.find("#max-hopcount").val()) || 100000000000},
+                     {'metric': 'bandwidth',
+                      'min': parseInt(modal.find("#min-bandwidth").val()) || 0,
+                      'max': parseInt(modal.find("#max-bandwidth").val()) || 100000000000}];
+
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: "api/spce/path/setup",
+    data: JSON.stringify({'source': source,
                           'destination': destination,
                           'obj_metrics': obj_metrics,
-                          'constraints': constraints}));
-    $.ajax({
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        url: "api/spce/path/setup",
-        data: JSON.stringify({'source': source,
-                              'destination': destination,
-                              'obj_metrics': obj_metrics,
-                              'constraints': constraints}),
-        success: function (data) {
-            alert(JSON.stringify(data));
-        },
-        dataType: "json"
-    });
+                          'constraints': constraints}),
+    success: function (data) {
+      modal.modal('hide');
+      // TODO: feedback
+      $("#ALTORouteManagementTab").click();
+    },
+    dataType: "json"
+  });
 });
 
 $("#SPCERateLimitingFormSubmit").click(function(e) {
-    var modal = $("#SPCERateControllerModal");
-    var source = modal.find("#l3source")[0]['value'];
-    var destination = modal.find("#l3destination")[0]['value'];
-    var bandwidth = modal.find("#rate-limit").val();
-    var bs = modal.find("#burst-size").val() | "200";
-    // Test Input
-    alert("source: " + source + ", destination: " + destination);
-    $.ajax({
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        url: "api/spce/tc/set",
-        data: JSON.stringify({'source': source,
-                              'destination': destination,
-                              'bandwidth': bandwidth,
-                              'bs': bs}),
-        success: function (data) {
-            alert(JSON.stringify(data));
-        },
-        dataType: "json"
-    });
+  var modal = $("#SPCERateControllerModal");
+  var operation = modal.find("#ALTORateControllerForm").attr("action");
+  var source = modal.find("#l3source")[0]['value'];
+  var destination = modal.find("#l3destination")[0]['value'];
+  var bandwidth = parseInt(modal.find("#rate-limit").val());
+  var bs = parseInt(modal.find("#burst-size").val()) || 200;
+  // Test Input
+  // alert("source: " + source + ", destination: " + destination);
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: "api/spce/tc/set",
+    data: JSON.stringify({'source': source,
+                          'destination': destination,
+                          'bandwidth': bandwidth,
+                          'bs': bs,
+                          'operation': operation}),
+    success: function (data) {
+      modal.modal('hide');
+      $("#ALTORouteManagementTab").click();
+    },
+    dataType: "json"
+  });
+});
+
+$("#ALTORemoveRateFormSubmit").click(function (e) {
+  var form = $(this).parent().parent();
+  var route = form.find("#route").text();
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: "api/spce/tc/remove",
+    data: JSON.stringify({'path': route}),
+    success: function (data) {
+      $("#ALTORouteManagementTab").click();
+    }
+  });
 });
 
 $('#PathFlowsConfirmationModal').on('show.bs.modal', function (event) {
@@ -291,7 +348,7 @@ $('#FlowAddModal').on('show.bs.modal', function (event) {
 
   var output_to = modal.find("#output")[0];
 
-  var interfaces = chart.nodes[node_id]['connectors']; 
+  var interfaces = chart.nodes[node_id]['connectors'];
 
   while (output_to.children.length > 0) {
     output_to.children[0].remove();

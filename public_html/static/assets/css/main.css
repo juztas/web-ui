@@ -55,7 +55,7 @@ nav {
   /* top: 70%; */
   bottom: 0;
   width: 100%;
-  z-index: 2000;
+  /* z-index: 2000; */
   transition: right 0.3s ease-in-out 0s;
   -webkit-transition: right 0.3s ease-in-out 0s;
   -moz-transition: right 0.3s ease-in-out 0s;
@@ -199,6 +199,10 @@ nav h3 {
 
 .table > tbody > tr.active > td, .table > tbody > tr.active > th, .table > tbody > tr > td.active, .table > tbody > tr > th.active, .table > tfoot > tr.active > td, .table > tfoot > tr.active > th, .table > tfoot > tr > td.active, .table > tfoot > tr > th.active, .table > thead > tr.active > td, .table > thead > tr.active > th, .table > thead > tr > td.active, .table > thead > tr > th.active {
     background-color: #555;
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: #666;
 }
 
 .eth {

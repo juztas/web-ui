@@ -85,7 +85,7 @@ def get_topology():
 
 @app.route('/flow/<node_id>/<table_id>', methods=['POST'])
 def install_flow(node_id, table_id):
-    """ 
+    """
     This will install a flow.
 
     You should pass via POST few args.
@@ -114,7 +114,7 @@ def install_flow(node_id, table_id):
 
 @app.route('/stats/flow/<node_id>/<table_id>/<clean_flow_id>', methods=['GET'])
 def flow_stats(node_id, table_id, clean_flow_id):
-    """ 
+    """
     This endpoint returns statistics to plot.
     You should pass a node id, table id and a clean flow id. (removing #, $, -
     and * symbols from id).
@@ -147,7 +147,7 @@ def flow_stats(node_id, table_id, clean_flow_id):
 
 @app.route('/routes/l2', methods=['POST'])
 def l2routes():
-    """ 
+    """
     This returns a list of all paths available between two MAC address. Also an
     random ID is generated for this session for each path. So you can use this ID
     when creating a complete PATH l2 flow.
@@ -238,7 +238,7 @@ def l3routes():
 
 @app.route('/flow/path/l2/<path_id>', methods=['POST'])
 def install_flows_for_l2path(path_id):
-    """ 
+    """
     This will install a l2 full path flows (based on MAC addresses) in all
     switches in a path.
 
@@ -302,7 +302,7 @@ def install_flows_for_l2path(path_id):
 
 @app.route('/flow/path/l3/<path_id>', methods=['POST'])
 def install_flows_for_l3path(path_id):
-    """ 
+    """
     This will install a l3 full path flows (based on IP Address addresses) in all
     switches in a path.
 
@@ -374,12 +374,45 @@ def spce_setup_path():
     spce = ALTOSpce(odl)
 
     try:
-        return flask.jsonify(spce.path_setup(src=source_ip,
-                               dst=target_ip,
-                               objective_metrics=obj_metrics,
-                               constraint_metric=constraints))
+        return flask.jsonify(spce.path_setup(src=source,
+                                             dst=destination,
+                                             objective_metrics=obj_metrics,
+                                             constraint_metric=constraints))
     except ODLErrorOnPOST as e:
         print "Error: 500 - Setup path failed"
+        flask.abort(500)
+
+@app.route('/spce/path/retrieve', methods=['POST'])
+def spce_get_paths():
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    spce = ALTOSpce(odl)
+
+    try:
+        paths = spce.get_all_paths()
+        alto_paths = []
+        for path in paths:
+            alto_paths.append({
+                "path": path.split('|')
+            })
+        return flask.jsonify(paths=alto_paths)
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Get path failed"
+        flask.abort(500)
+
+@app.route('/spce/path/remove', methods=['POST'])
+def spce_remove_path():
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    path = data['path']
+
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    spce = ALTOSpce(odl)
+
+    try:
+        return flask.jsonify(spce.path_remove([path]))
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Remove path failed"
         flask.abort(500)
 
 @app.route('/spce/tc/set', methods=['POST'])
@@ -389,13 +422,32 @@ def spce_set_tc():
     destination = data['destination']
     bandwidth = data['bandwidth']
     bs = data['bs']
+    operation = data['operation']
 
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
     spce = ALTOSpce(odl)
 
     try:
-        return flask.jsonify(spce.set_tc(src=source_ip, dst=target_ip, bd=bandwidth, bs=bs))
+        if operation == 'create':
+            return flask.jsonify(spce.set_tc(src=source, dst=target, bd=bandwidth, bs=bs))
+        else:
+            return flask.jsonify(spce.update_tc(src=source, dst=target, bd=bandwidth, bs=bs))
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Rate limiting setup failed"
+        flask.abort(500)
+
+@app.route('/spce/tc/remove', methods=['POST'])
+def spce_remove_tc():
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    path = data['path']
+
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    spce = ALTOSpce(odl)
+
+    try:
+        return flask.jsonify(spce.remove_tc({'path': path}))
     except ODLErrorOnPOST as e:
         print "Error: 500 - Rate limiting setup failed"
         flask.abort(500)
@@ -450,5 +502,3 @@ if __name__ == "__main__":
         sys.exit(1)
 
     app.run(host="0.0.0.0", port=80, debug=True, threaded=True)
-
-
