@@ -123,7 +123,7 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
 
 });
 
-$('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', function (event) {
+$('#L3RouteCalculationModal, #ALTORouteCalculationModal, #ALTOTaskSubmissionModal').on('show.bs.modal', function (event) {
   var modal = $(this);
   var source = modal.find("#l3source")[0];
   var destination = modal.find("#l3destination")[0];
@@ -204,6 +204,18 @@ $("#ALTORouteManagementTab").click(function(e) {
   });
 });
 
+$("#ALTOTaskManagementTab").click(function (e) {
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: "api/spce/task/stat",
+    data: JSON.stringify({}),
+    success: function (data) {
+      alto_task_manager(data['tasks']);
+    }
+  });
+});
+
 $("#ALTORouteRemoveModal").on("show.bs.modal", function (event) {
   var button = $(event.relatedTarget);
   var route = button.data('route');
@@ -228,6 +240,7 @@ $("#ALTORemoveRouteFormSubmit").click(function (e) {
     url: "api/spce/path/remove",
     data: JSON.stringify({'path': route}),
     success: function (data) {
+      $('#ALTORouteRemoveModal').modal('hide');
       $("#ALTORouteManagementTab").click();
     }
   });
@@ -265,12 +278,11 @@ $("#SPCESetupPathFormSubmit").click(function(e) {
 $("#SPCERateLimitingFormSubmit").click(function(e) {
   var modal = $("#SPCERateControllerModal");
   var operation = modal.find("#ALTORateControllerForm").attr("action");
-  var source = modal.find("#l3source")[0]['value'];
-  var destination = modal.find("#l3destination")[0]['value'];
+  var source = modal.find("#l3source").text();
+  var destination = modal.find("#l3destination").text();
   var bandwidth = parseInt(modal.find("#rate-limit").val());
   var bs = parseInt(modal.find("#burst-size").val()) || 200;
   // Test Input
-  // alert("source: " + source + ", destination: " + destination);
   $.ajax({
     type: "POST",
     contentType: "application/json; charset=utf-8",
@@ -288,6 +300,28 @@ $("#SPCERateLimitingFormSubmit").click(function(e) {
   });
 });
 
+$("#ALTOTaskSubmissionFormSubmit").click(function (e) {
+  var modal = $("#ALTOTaskSubmissionModal");
+  var source = modal.find("#l3source").val();
+  var destination = modal.find("#l3destination").val();
+  var source_file = modal.find("#source_file").val();
+  var destination_file = modal.find("#destination_file").val();
+  $.ajax({
+    type: "POST",
+    contentType: "applicaiton/json; charset=utf-8",
+    url: "api/spce/task/submit",
+    data: JSON.stringify({'source': source,
+                          'destination': destination,
+                          'source_file': source_file,
+                          'destination_file': destination_file}),
+    success: function (data) {
+      modal.modal('hide');
+      $("#ALTOTaskSubmissionTab").click();
+    },
+    dataType: "json"
+  });
+});
+
 $("#ALTORemoveRateFormSubmit").click(function (e) {
   var form = $(this).parent().parent();
   var route = form.find("#route").text();
@@ -297,6 +331,7 @@ $("#ALTORemoveRateFormSubmit").click(function (e) {
     url: "api/spce/tc/remove",
     data: JSON.stringify({'path': route}),
     success: function (data) {
+      $("#ALTORateRemoveModal").modal('hide');
       $("#ALTORouteManagementTab").click();
     }
   });

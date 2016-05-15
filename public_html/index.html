@@ -47,6 +47,8 @@
           <li><a href="/hosts.html"><i class="fa fa-fw fa-th-list"></i> All Hosts</a></li>
           <li><a id="ALTORouteCalculationTab" href="#" data-toggle="modal" data-target="#ALTORouteCalculationModal"><i class="fa fa-fw fa-exchange"></i> ALTO Route Calculation</a></li>
           <li><a id="ALTORouteManagementTab" href="#"><i class="fa fa-fw fa-wrench"></i> ALTO Route Management</a></li>
+          <li><a id="ALTOTaskSubmissionTab" href="#" data-toggle="modal" data-target="#ALTOTaskSubmissionModal"><i class="fa fa-fw fa-exchange"></i> ALTO Task Submission</a></li>
+          <li><a id="ALTOTaskManagementTab" href="#"><i class="fa fa-fw fa-wrench"></i> ALTO Task Management</a></li>
         </ul>
       </div><!-- /#sidebar-wrapper -->
 
@@ -288,7 +290,7 @@
 
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+              <input type="button" id="ALTORemoveRouteFormSubmit" class="btn btn-danger" value="Yes, I would like to confirm">
             </form>
           </div>
         </div>
@@ -358,7 +360,62 @@
 
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <input type="submit" id="ALTORemoveRateFormSubmit" class="btn btn-danger" value="Yes, I would like to confirm">
+              <input type="button" id="ALTORemoveRateFormSubmit" class="btn btn-danger" value="Yes, I would like to confirm">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="ALTOTaskSubmissionModal" tabindex="-1" role="dialog" aria-labelledby="generic-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="generic-modal-title">ALTO Task Submission</h4>
+          </div>
+
+          <div class="modal-body" id="modal-msg">
+            <form id ="taskSubmissionForm" action="#" method="POST" class="form-horizontal">
+
+              <div class="form-group">
+                <label for="source" class="col-sm-2 control-label">Source:</label>
+                <div class="col-sm-10">
+
+                <select id="l3source" name="source" class="form-control">
+                  <option>Choose a source host</option>
+                </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="destination" class="col-sm-2 control-label">Destination:</label>
+                <div class="col-sm-10">
+                <select id="l3destination" name="destination" class="form-control">
+                  <option>Choose a destination host</option>
+                </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="source_file" class="col-sm-2 control-label">Source File:</label>
+                <div class="col-sm-10">
+                <input type="text" id="source_file" name="source_file" class="form-control" placeholder="Source File URL">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="destination_file" class="col-sm-2 control-label">Destination File:</label>
+                <div class="col-sm-10">
+                <input type="text" id="destination_file" name="destination_file" class="form-control" placeholder="Destination File URL">
+                </div>
+              </div>
+
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <input type="button" id="ALTOTaskSubmissionFormSubmit" class="btn btn-danger" value="Submit Task">
             </form>
           </div>
         </div>

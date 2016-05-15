@@ -12,7 +12,7 @@ from settings.production import *
 
 from odl.instance import ODLInstance
 from odl.altospce import ALTOSpce
-from odl.exceptions import NodeNotFound, TableNotFound, FlowNotFound
+from odl.exceptions import NodeNotFound, TableNotFound, FlowNotFound, ODLErrorOnPOST
 
 from networkx import nx
 
@@ -392,9 +392,10 @@ def spce_get_paths():
         paths = spce.get_all_paths()
         alto_paths = []
         for path in paths:
-            alto_paths.append({
-                "path": path.split('|')
-            })
+            p = {'path': path['path'].split('|')}
+            if 'tc' in path.keys() and path['tc'] >= 0:
+                p['tc'] = path['tc']
+            alto_paths.append(p)
         return flask.jsonify(paths=alto_paths)
     except ODLErrorOnPOST as e:
         print "Error: 500 - Get path failed"
@@ -430,9 +431,9 @@ def spce_set_tc():
 
     try:
         if operation == 'create':
-            return flask.jsonify(spce.set_tc(src=source, dst=target, bd=bandwidth, bs=bs))
+            return flask.jsonify(spce.set_tc(src=source, dst=destination, bd=bandwidth, bs=bs))
         else:
-            return flask.jsonify(spce.update_tc(src=source, dst=target, bd=bandwidth, bs=bs))
+            return flask.jsonify(spce.update_tc(src=source, dst=destination, bd=bandwidth, bs=bs))
     except ODLErrorOnPOST as e:
         print "Error: 500 - Rate limiting setup failed"
         flask.abort(500)
@@ -447,7 +448,32 @@ def spce_remove_tc():
     spce = ALTOSpce(odl)
 
     try:
-        return flask.jsonify(spce.remove_tc({'path': path}))
+        return flask.jsonify(spce.remove_tc(path))
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Rate limiting setup failed"
+        flask.abort(500)
+
+@app.route('/spce/task/submit', methods=['POST'])
+def spce_task_submit():
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    source = data['source']
+    destination = data['destination']
+    source_file = data['source_file']
+    destination_file = data['destination_file']
+
+    try:
+        # TODO: submit to task management server
+        return flask.jsonify(result="OK")
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Rate limiting setup failed"
+        flask.abort(500)
+
+@app.route('/spce/task/stat', methods=['POST'])
+def spce_task_stat():
+    tasks = []
+    # TODO: get tasks stat
+    try:
+        return flask.jsonify({'tasks': tasks})
     except ODLErrorOnPOST as e:
         print "Error: 500 - Rate limiting setup failed"
         flask.abort(500)

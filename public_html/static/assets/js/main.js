@@ -86,6 +86,21 @@ function alto_path_manager(paths) {
   });
 }
 
+function alto_task_manager(tasks) {
+  $("nav").show();
+  clear_pannel_info();
+  // TODO: dispay tasks stat
+  getTemplateAjax('alto-task-management.handlebars', function(template) {
+    // Test part
+    tasks.push({id: "i", source: "10.0.0.1:/volume/test1", destination: "10.0.0.2:/volume/test2", size: 10000, remain: 5000, speed: 100000, limit: 200000});
+    tasks.push({id: "j", source: "10.0.0.3:/volume/test3", destination: "10.0.0.2:/volume/test4", size: 50000, remain: 1000, speed: 200000, limit: 200000});
+    tasks.push({id: "k", source: "10.0.0.4:/volume/test5", destination: "10.0.0.3:/volume/test6", size: 100000, remain: 5000, speed: 100000, limit: 100000});
+
+    var context = {tasks: tasks};
+    $('#node-details').html(template(context));
+  });
+}
+
 function plot_flow(clean_flow_id, table_id, node_id) {
   clear_pannel_info();
 
