@@ -316,7 +316,7 @@ $("#ALTOTaskSubmissionFormSubmit").click(function (e) {
                           'destination_file': destination_file}),
     success: function (data) {
       modal.modal('hide');
-      $("#ALTOTaskSubmissionTab").click();
+      $("#ALTOTaskManagementTab").click();
     },
     dataType: "json"
   });
