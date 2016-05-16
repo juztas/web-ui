@@ -51,6 +51,17 @@ function display_paths(source, destination, paths) {
                    destination: destination,
                    paths: paths};
     $('#node-details').html(template(context));
+
+    $("#path-details-table tbody tr").hover(function () {
+      $(this).find('span').each(function () {
+        var source = $(this).text().replace(/:/g, '\\\:').replace(/\./g, '\\\.');
+        d3.selectAll('.link-' + source).attr("style", "stroke: #FFF; stroke-width: 8px;");
+      });}, function () {
+        $(this).find('span').each(function () {
+          var source = $(this).text().replace(/:/g, '\\\:').replace(/\./g, '\\\.');
+          d3.selectAll('.link-' + source).attr("style", "");
+        });
+      });
   });
 }
 
@@ -67,6 +78,19 @@ function alto_path_manager(paths) {
 
     var context = {paths: paths};
     $('#node-details').html(template(context));
+
+    $("#route-management-table tbody tr").hover(function () {
+      var route = $(this).find('td:first a').data('route').split(',');
+      route.slice(0, -1).forEach(function (e) {
+        var source = e.replace(/:/g, '\\\:').replace(/\./g, '\\\.');
+        d3.selectAll('.link-' + source).attr("style", "stroke: #FFF; stroke-width: 8px;");
+      });}, function () {
+        var route = $(this).find('td:first a').data('route').split(',');
+        route.slice(0, -1).forEach(function (e) {
+          var source = e.replace(/:/g, '\\\:').replace(/\./g, '\\\.');
+          d3.selectAll('.link-' + source).attr("style", "");
+        });
+      });
 
     $(".tc-update, .tc-create").click(function(e) {
       var spans = $(this).parent().prev().prev().children();

@@ -302,7 +302,18 @@ var D3Force = function(nodes, links, div) {
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
     .enter().append("line")
-    .attr("class", function(d) { return d.type + "-link" + " " + d.capacity + "-link"; });
+    .attr("class", function(d) { return d.type + "-link" +
+                                 " " + d.capacity + "-link" +
+                                 ((d.type === "link" || d.type === "host") ?
+                                  " link-" + d.source.id + (
+                                    d.source.type === "host" ?
+                                      " link-" + d.source['host-tracker-service:addresses'][0].ip
+                                      : ""
+                                  ) + " link-" + d.target.id + (
+                                    d.target.type === "host" ?
+                                      " link-" + d.target['host-tracker-service:addresses'][0].ip
+                                      : ""
+                                  ) : ""); });
 
   this.node = this.svg.selectAll(".node")
     .data(this.force.nodes())
