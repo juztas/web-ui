@@ -274,9 +274,9 @@ var D3Force = function(nodes, links, div) {
       port.py += d3.event.dy;
       port.x += d3.event.dx;
       port.y += d3.event.dy;
-      // tick();
+      tick();
     }
-    // tick();
+    tick();
   };
 
   this.dragend = function(d, i) {
@@ -365,7 +365,7 @@ var D3Force = function(nodes, links, div) {
     .style('fill', 'white')
     .text(function(d){ return '\uf233'; });
 
-  for (var i = tick_times; i > 0; --i) this.force.tick();
+  for (var i = tick_times * tick_times; i > 0; --i) this.force.tick();
   this.force.stop();
 
   this.show_switch_labels("ip_address");

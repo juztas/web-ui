@@ -61,9 +61,9 @@ function alto_path_manager(paths) {
   getTemplateAjax('alto-route-management.handlebars', function(template) {
 
     // Test part
-    paths.push({path: ['src_host1', 'node1', 'node2', 'node3', 'node4', 'node5', 'dest_host2'], tc: 10000000});
-    paths.push({path: ['src_host0', 'node9', 'node8', 'node3', 'node4', 'node6', 'dest_host5']});
-    paths.push({path: ['src_host3', 'node7', 'node8', 'node3', 'node4', 'node6', 'dest_host4'], tc: 40000000});
+    // paths.push({path: ['src_host1', 'node1', 'node2', 'node3', 'node4', 'node5', 'dest_host2'], tc: 10000000});
+    // paths.push({path: ['src_host0', 'node9', 'node8', 'node3', 'node4', 'node6', 'dest_host5']});
+    // paths.push({path: ['src_host3', 'node7', 'node8', 'node3', 'node4', 'node6', 'dest_host4'], tc: 40000000});
 
     var context = {paths: paths};
     $('#node-details').html(template(context));

@@ -1,20 +1,16 @@
 $("#menu-toggle").click(function(e) {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
+  $("nav").toggleClass("narrow");
 });
 
 $("#zoom-mode").click(function(e) {
-  chart.zoom = ! chart.zoom;
-  if (chart.zoom) {
-    $('#zoom-mode').addClass('active');
-  } else {
-    $('#zoom-mode').removeClass('active');
-  }
+  $('#zoom-mode').toggleClass('active');
 });
 
 /* Save positions */
 d3.select('#save-layout').on('click', function() {
-  chart.save_layout()
+  chart.save_layout();
 });
 
 /* Restore positions */
