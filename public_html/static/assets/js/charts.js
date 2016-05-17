@@ -39,6 +39,8 @@ var D3Force = function(nodes, links, div) {
     d3.selectAll(".node").style("opacity", "1");
     d3.selectAll(".link-link").style("opacity", "1");
     $("nav").hide();
+    toggle_task_timer = false;
+    clearTimeout(task_management_timer);
   };
 
   this.highlight_switch = function(node) {

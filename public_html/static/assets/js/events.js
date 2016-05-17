@@ -119,7 +119,7 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
 
 });
 
-$('#L3RouteCalculationModal, #ALTORouteCalculationModal, #ALTOTaskSubmissionModal').on('show.bs.modal', function (event) {
+$('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', function (event) {
   var modal = $(this);
   var source = modal.find("#l3source")[0];
   var destination = modal.find("#l3destination")[0];
@@ -163,6 +163,44 @@ $('#L3RouteCalculationModal, #ALTORouteCalculationModal, #ALTOTaskSubmissionModa
 
 });
 
+$("#ALTOTaskSubmissionModal").on('show.bs.modal', function (event) {
+  var modal = $(this);
+  var source = modal.find("#l3source")[0];
+  var destination = modal.find("#l3destination")[0];
+  $.ajax({
+    method: 'GET',
+    contentType: "application/json; charset=utf-8",
+    url: "/api/spce/task/sites",
+    success: function (data) {
+      var servers = data['servers'];
+      var clients = data['clients'];
+      while (source.children.length > 0) {
+        source.children[0].remove();
+      }
+
+      while (destination.children.length >0) {
+        destination.children[0].remove();
+      }
+
+      for(var i = 0; i < servers.length; i++) {
+        var el = document.createElement("option");
+        el.textContent = servers[i];
+        el.value = servers[i];
+        source.appendChild(el);
+      }
+
+      for(var i = 0; i < clients.length; i++) {
+        var el = document.createElement("option");
+        el.textContent = clients[i];
+        el.value = clients[i];
+        destination.appendChild(el);
+      }
+    }
+  });
+
+});
+
+
 $("#L3RouteCalculationFormSubmit").click(function(e) {
   var modal = $("#L3RouteCalculationModal");
   var source = modal.find("#l3source")[0]['value'];
@@ -201,15 +239,26 @@ $("#ALTORouteManagementTab").click(function(e) {
 });
 
 $("#ALTOTaskManagementTab").click(function (e) {
-  $.ajax({
-    type: "POST",
-    contentType: "application/json; charset=utf-8",
-    url: "api/spce/task/stat",
-    data: JSON.stringify({}),
-    success: function (data) {
-      alto_task_manager(data['tasks']);
+  toggle_task_timer = true;
+  task_management_timer = function () {
+    if (toggle_task_timer) {
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "api/spce/task/stat",
+        data: JSON.stringify({}),
+        success: function (data) {
+          alto_task_manager(data['tasks']);
+        },
+        error: function (xhr, status, error) {
+          alto_task_manager([]);
+        },
+        dataType: "json"
+      });
+      setTimeout(task_management_timer, 2000);
     }
-  });
+  };
+  task_management_timer();
 });
 
 $("#ALTORouteRemoveModal").on("show.bs.modal", function (event) {
@@ -301,7 +350,7 @@ $("#ALTOTaskSubmissionFormSubmit").click(function (e) {
   var source = modal.find("#l3source").val();
   var destination = modal.find("#l3destination").val();
   var source_file = modal.find("#source_file").val();
-  var destination_file = modal.find("#destination_file").val();
+  var destination_dir = modal.find("#destination_dir").val();
   $.ajax({
     type: "POST",
     contentType: "applicaiton/json; charset=utf-8",
@@ -309,10 +358,15 @@ $("#ALTOTaskSubmissionFormSubmit").click(function (e) {
     data: JSON.stringify({'source': source,
                           'destination': destination,
                           'source_file': source_file,
-                          'destination_file': destination_file}),
+                          'destination_dir': destination_dir}),
     success: function (data) {
       modal.modal('hide');
       $("#ALTOTaskManagementTab").click();
+      alert(JSON.stringify(data));
+    },
+    error: function (xhr, status, error) {
+      alert('Submission Failed for Some Reasons...');
+      modal.modal('hide');
     },
     dataType: "json"
   });
