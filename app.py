@@ -7,6 +7,7 @@ import time
 import os
 import rrdtool
 import datetime
+import requests
 
 from settings.production import *
 
@@ -459,11 +460,20 @@ def spce_task_submit():
     source = data['source']
     destination = data['destination']
     source_file = data['source_file']
-    destination_file = data['destination_file']
+    destination_dir = data['destination_dir']
 
     try:
-        # TODO: submit to task management server
-        return flask.jsonify(result="OK")
+        # Submit to task management server
+        endpoint = fdt_master + '/task/submit'
+        headers = { 'Content-type': 'application/json' }
+        data = {
+            "server": {"hostname": source},
+            "client": {"hostname": destination},
+            "files": [source_file],
+            "target": destination_dir
+        }
+        requests.post(endpoint, headers=headers, data=json.dumps(data))
+        return flask.jsonify(data)
     except ODLErrorOnPOST as e:
         print "Error: 500 - Rate limiting setup failed"
         flask.abort(500)
@@ -471,9 +481,42 @@ def spce_task_submit():
 @app.route('/spce/task/stat', methods=['POST'])
 def spce_task_stat():
     tasks = []
-    # TODO: get tasks stat
+    # Get tasks stat
     try:
+        endpoint = fdt_master + '/task/status'
+        headers = { 'Content-type': 'application/json' }
+        response = requests.get(endpoint, headers=headers)
+        data = json.loads(response.text)
+        for uuid in data.keys():
+            stat = data[uuid]['stat']
+            source = stat.get('server', {})
+            target = stat.get('client', {})
+            speed = stat.get('speed', {})
+            files = ','.join(data[uuid]['files'])
+            tasks.append({
+                "uuid": uuid,
+                "source": source.get('ip', '*') + ':' + source.get('port', '*') + files,
+                "target": target.get('ip', '*') + ':' + target.get('port', '*'),
+                "net_speed": speed.get('net', '-'),
+                "avg_speed": speed.get('avg', '-'),
+                "size": stat.get('size', '-'),
+                "status": stat.get('status', '-'),
+                "progress": stat.get('progress', '-')
+            })
         return flask.jsonify({'tasks': tasks})
+    except ODLErrorOnPOST as e:
+        print "Error: 500 - Rate limiting setup failed"
+        flask.abort(500)
+
+@app.route('/spce/task/sites', methods=['GET'])
+def spce_task_sites():
+    sites = []
+    try:
+        endpoint = fdt_master + '/list'
+        headers = { 'Content-type': 'application/json' }
+        response = requests.get(endpoint, headers=headers)
+        data = json.loads(response.text)
+        return flask.jsonify(data)
     except ODLErrorOnPOST as e:
         print "Error: 500 - Rate limiting setup failed"
         flask.abort(500)
