@@ -265,7 +265,8 @@ $("#ALTORouteRemoveModal").on("show.bs.modal", function (event) {
   var button = $(event.relatedTarget);
   var route = button.data('route');
   var modal = $(this);
-  modal.find("#route").text(route.replace(/,/g, '|'));
+  modal.find("#route").data('route', route.replace(/,/g, '|'));
+  modal.find("#route").html('<span class="label label-primary">' + route.replace(/,/g, '</span><span class="label label-primary">') + '</span>');
 });
 
 $("#ALTORateRemoveModal").on("show.bs.modal", function (event) {
@@ -273,12 +274,13 @@ $("#ALTORateRemoveModal").on("show.bs.modal", function (event) {
         .first().children().first();
   var route = button.data('route');
   var modal = $(this);
-  modal.find("#route").text(route.replace(/,/g, '|'));
+  modal.find("#route").data('route', route.replace(/,/g, '|'));
+  modal.find("#route").html('<span class="label label-primary">' + route.replace(/,/g, '</span><span class="label label-primary">') + '</span>');
 });
 
 $("#ALTORemoveRouteFormSubmit").click(function (e) {
   var form = $(this).parent().parent();
-  var route = form.find("#route").text();
+  var route = form.find("#route").data("route");
   $.ajax({
     type: "POST",
     contentType: "application/json; charset=utf-8",
@@ -325,8 +327,8 @@ $("#SPCERateLimitingFormSubmit").click(function(e) {
   var operation = modal.find("#ALTORateControllerForm").attr("action");
   var source = modal.find("#l3source").text();
   var destination = modal.find("#l3destination").text();
-  var bandwidth = parseInt(modal.find("#rate-limit").val());
-  var bs = parseInt(modal.find("#burst-size").val()) || 200;
+  var bandwidth = parseInt(modal.find("#rate-limit").val()) || 1000000;
+  var bs = parseInt(modal.find("#burst-size").val()) || bandwidth;
   // Test Input
   $.ajax({
     type: "POST",

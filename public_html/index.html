@@ -285,7 +285,7 @@
             <h4 class="modal-title" id="generic-modal-title">Are you sure about that?</h4>
           </div>
           <form id="ALTORemoveRouteForm" action="" method="POST">
-          <div class="modal-body" id="modal-msg">This action is destructive. Are you sure that you want remove the route <span id="route"></span>?
+          <div class="modal-body" id="modal-msg">This action is destructive. Are you sure that you want remove the route <div id="route" data-route=""></div>?
           </div>
 
           <div class="modal-footer">
@@ -326,14 +326,14 @@
               <div class="form-group">
                 <label for="rate-limit" class="col-sm-2 control-label">BandWidth:</label>
                 <div class="col-sm-10">
-                <input type="text" id="rate-limit" name="rate-limit" class="form-control" placeholder="Maximum BandWidth Limit">
+                <input type="text" id="rate-limit" name="rate-limit" class="form-control" placeholder="Maximum BandWidth Limit (Default 1000000)">
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="burst-size" class="col-sm-2 control-label">BurstSize:</label>
                 <div class="col-sm-10">
-                <input type="text" id="burst-size" name="burst-size" class="form-control" placeholder="Default Burst Size is 200">
+                <input type="text" id="burst-size" name="burst-size" class="form-control" placeholder="Default Burst Size is the same as BandWidth">
                 </div>
               </div>
           </div>
@@ -355,7 +355,7 @@
             <h4 class="modal-title" id="generic-modal-title">Are you sure about that?</h4>
           </div>
           <form id="ALTORemoveRateForm" action="" method="POST">
-          <div class="modal-body" id="modal-msg">This action is destructive. Are you sure that you want remove the route <span id="route"></span>?
+          <div class="modal-body" id="modal-msg">This action is destructive. Are you sure that you want remove the route <div id="route" data-route=""></div>?
           </div>
 
           <div class="modal-footer">
