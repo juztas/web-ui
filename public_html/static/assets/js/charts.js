@@ -3,7 +3,7 @@ var D3Force = function(nodes, links, div) {
   this.links = links;
   this.div = div;
   this.width = $(div).parent().width();
-  this.height = $(window).height();
+  this.height = $(window).height() - 75;
   this.zoom = true;
 
   var _this = this;
@@ -358,7 +358,8 @@ var D3Force = function(nodes, links, div) {
 
   function resize() {
     _this.width = $(_this.div).parent().width();
-    _this.height = $(_this.div).parent().height();
+    _this.height = $(window).height() - 75;
+    $(_this.div).attr("width", _this.width).attr("height", _this.height);
     $(_this.div).children().attr("width", _this.width).attr("height", _this.height);
     _this.svg.attr("width", _this.width).attr("height", _this.height);
     _this.force.size([_this.width, _this.height]).resume();
