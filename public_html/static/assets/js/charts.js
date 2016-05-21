@@ -359,8 +359,8 @@ var D3Force = function(nodes, links, div) {
   function resize() {
     _this.width = $(_this.div).parent().width();
     _this.height = $(_this.div).parent().height();
+    $(_this.div).children().attr("width", _this.width).attr("height", _this.height);
     _this.svg.attr("width", _this.width).attr("height", _this.height);
-    $(_this.svg).parent().attr("width", _this.width).attr("height", _this.height);
     _this.force.size([_this.width, _this.height]).resume();
   }
 
