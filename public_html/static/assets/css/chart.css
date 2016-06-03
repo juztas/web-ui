@@ -1,18 +1,18 @@
 .link-link {
   fill: none;
 /*  stroke: #999; */
-  stroke-width: 6.5px;
+  stroke-width: 1.5px;
 }
 
 .host-link {
   fill: none;
 /*  stroke: #999; */
-  stroke-width: 6.5px;
+  stroke-width: 4px;
 }
 
 .port-link {
   fill: none;
-  stroke: #666;
+  stroke: #CC9966;
   stroke-width: 0px;
 }
 
@@ -21,21 +21,21 @@
 }
 
 .ten-ge-link {
-  stroke: #444
+  stroke: #996633
 }
 
 .forty-ge-link {
-  stroke: purple
+  stroke: #9999FF
 }
 
 .hundred-ge-link {
-  stroke: green
+  stroke: #CC6666
 }
 
 .switch-circle {
-  fill: #000;
-  stroke: #B94431;
-  stroke-width: 3.5px;
+  //fill: #CCFFFF;
+  stroke: #99CCCC;
+  stroke-width: 3px;
 }
 
 .ovs-circle {
@@ -51,9 +51,9 @@
 }
 
 .port-circle {
-  stroke: #B94431;
+  stroke: #FFCC00;
   stroke-width: 1.5px;
-  fill: #000;
+  fill: #FFCC00;
 }
 
 node {
@@ -63,7 +63,7 @@ node {
 
 .switch text,
 .ovs text {
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .port text {
@@ -94,7 +94,7 @@ path.link {
   stroke: lightgreen;
 }
 
-path { 
+path {
     stroke: steelblue;
     stroke-width: 2;
     fill: none;
