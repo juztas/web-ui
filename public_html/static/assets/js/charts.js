@@ -278,14 +278,14 @@ var D3Force = function(nodes, links, div) {
 
     var filteredLinks = [];
     this.links.forEach(function(link) {
-        if (link.type === "link") {
+        if (link.type === "link" || link.type === "host") {
             if (link.source.type === "port") {
                 link.source_port = link.source;
-                _this.ports.push(link.source_port);
                 link.source = nodes[link.source.id.split(':').slice(0, 2).join(':')];
             }
             if (link.target.type === "port") {
                 link.target_port = link.target;
+                _this.ports.push(link.target_port);
                 link.target = nodes[link.target.id.split(':').slice(0, 2).join(':')];
             }
             filteredLinks.push(link);
@@ -401,9 +401,9 @@ var D3Force = function(nodes, links, div) {
             });
 
         _this.link.each(function(d) {
-            if (d.source_port) {
-                d.source_port.x = d.source.x + ((d.target.x - d.source.x) * size.switch) / (Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2)));
-                d.source_port.y = d.source.y + ((d.target.y - d.source.y) * size.switch) / (Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2)));
+            if (d.target_port) {
+                d.target_port.x = d.target.x - ((d.target.x - d.source.x) * size.switch) / (Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2)));
+                d.target_port.y = d.target.y - ((d.target.y - d.source.y) * size.switch) / (Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2)));
             }
         });
 
