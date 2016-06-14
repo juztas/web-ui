@@ -358,12 +358,16 @@ var D3Force = function(nodes, links, div) {
             return d.type + "-link" +
                 " " + d.capacity + "-link" +
                 ((d.type === "link" || d.type === "host") ?
-                    " link-" + d.source.id + (
+                    (
                         d.source.type === "host" ?
-                        " link-" + d.source['host-tracker-service:addresses'][0].ip : ""
-                    ) + " link-" + d.target.id + (
+                        " link-" + d.source.id +
+                        " link-" + d.source['host-tracker-service:addresses'][0].ip :
+                        " link-" + d.source_port.id
+                    ) + (
                         d.target.type === "host" ?
-                        " link-" + d.target['host-tracker-service:addresses'][0].ip : ""
+                        " link-" + d.target.id +
+                        " link-" + d.target['host-tracker-service:addresses'][0].ip :
+                        " link-" + d.target_port.id
                     ) : "");
         });
 
