@@ -591,6 +591,14 @@ information: <br><br>
         $.ajax({
           type: "GET",
           url: "/api/topology",
+          headers: {
+            "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+          },
+          statusCode: {
+            401: function() {
+              window.location.href = "/login.html";
+            }
+          },
           success: function (topology) {
                     // Load main chart
                     chart = new D3Force(topology['nodes'],

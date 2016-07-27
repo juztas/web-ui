@@ -8,6 +8,7 @@ import os
 import rrdtool
 import datetime
 import requests
+from functools import wraps
 
 from settings.production import *
 
@@ -22,6 +23,24 @@ app.debug = True
 
 session_l2paths = {}
 session_l3paths = {}
+
+def check_auth(username, password):
+    return username == ui_user and password == ui_pass
+
+def authenticate():
+    return flask.Response(
+        'Could not verify your access level for that URL.\n'
+        'You have to login with proper credentials', 401,
+        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = flask.request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 def get_ports_on_path(path):
     regex = r'^openflow:[0-9a-z-]+:[0-9]+$'
@@ -57,7 +76,13 @@ def get_rrd_stats(node_id, table_id, clean_flow_id):
             ts += step
     return data
 
+@app.route('/verify', methods=['GET'])
+@requires_auth
+def verify():
+    return flask.jsonify({"success": True})
+
 @app.route('/layout', methods=['POST', 'GET'])
+@requires_auth
 def layout():
     client_ip = "%s" % flask.request.environ['REMOTE_ADDR']
     filename = "%s/%s-layout.p" % (layouts_dir, client_ip)
@@ -75,6 +100,7 @@ def layout():
     return flask.redirect("/")
 
 @app.route('/topology', methods=['GET'])
+@requires_auth
 def get_topology():
     """
     This endpoint returns a big topology with nodes and links.
@@ -85,6 +111,7 @@ def get_topology():
     return flask.jsonify(data)
 
 @app.route('/flow/<node_id>/<table_id>', methods=['POST'])
+@requires_auth
 def install_flow(node_id, table_id):
     """
     This will install a flow.
@@ -114,6 +141,7 @@ def install_flow(node_id, table_id):
     return flask.redirect("/")
 
 @app.route('/stats/flow/<node_id>/<table_id>/<clean_flow_id>', methods=['GET'])
+@requires_auth
 def flow_stats(node_id, table_id, clean_flow_id):
     """
     This endpoint returns statistics to plot.
@@ -147,6 +175,7 @@ def flow_stats(node_id, table_id, clean_flow_id):
                           'oposite': oposite})
 
 @app.route('/routes/l2', methods=['POST'])
+@requires_auth
 def l2routes():
     """
     This returns a list of all paths available between two MAC address. Also an
@@ -181,6 +210,7 @@ def l2routes():
     return flask.jsonify({'paths': paths})
 
 @app.route('/routes/l3', methods=['POST'])
+@requires_auth
 def l3routes():
     """
     This returns a list of all paths available between two IPv4 address. Also an
@@ -238,6 +268,7 @@ def l3routes():
 
 
 @app.route('/flow/path/l2/<path_id>', methods=['POST'])
+@requires_auth
 def install_flows_for_l2path(path_id):
     """
     This will install a l2 full path flows (based on MAC addresses) in all
@@ -302,6 +333,7 @@ def install_flows_for_l2path(path_id):
     return flask.redirect("/")
 
 @app.route('/flow/path/l3/<path_id>', methods=['POST'])
+@requires_auth
 def install_flows_for_l3path(path_id):
     """
     This will install a l3 full path flows (based on IP Address addresses) in all
@@ -363,6 +395,7 @@ def install_flows_for_l3path(path_id):
     return flask.redirect("/")
 
 @app.route('/spce/path/setup', methods=['POST'])
+@requires_auth
 def spce_setup_path():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     source = data['source']
@@ -384,6 +417,7 @@ def spce_setup_path():
         flask.abort(500)
 
 @app.route('/spce/path/retrieve', methods=['POST'])
+@requires_auth
 def spce_get_paths():
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
@@ -403,6 +437,7 @@ def spce_get_paths():
         flask.abort(500)
 
 @app.route('/spce/path/remove', methods=['POST'])
+@requires_auth
 def spce_remove_path():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     path = data['path']
@@ -418,6 +453,7 @@ def spce_remove_path():
         flask.abort(500)
 
 @app.route('/spce/tc/set', methods=['POST'])
+@requires_auth
 def spce_set_tc():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     source = data['source']
@@ -440,6 +476,7 @@ def spce_set_tc():
         flask.abort(500)
 
 @app.route('/spce/tc/remove', methods=['POST'])
+@requires_auth
 def spce_remove_tc():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     path = data['path']
@@ -455,6 +492,7 @@ def spce_remove_tc():
         flask.abort(500)
 
 @app.route('/spce/task/submit', methods=['POST'])
+@requires_auth
 def spce_task_submit():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     source = data['source']
@@ -479,6 +517,7 @@ def spce_task_submit():
         flask.abort(500)
 
 @app.route('/spce/task/stat', methods=['POST'])
+@requires_auth
 def spce_task_stat():
     tasks = []
     # Get tasks stat
@@ -509,6 +548,7 @@ def spce_task_stat():
         flask.abort(500)
 
 @app.route('/spce/task/sites', methods=['GET'])
+@requires_auth
 def spce_task_sites():
     sites = []
     try:
@@ -522,6 +562,7 @@ def spce_task_sites():
         flask.abort(500)
 
 @app.route('/flow/<node_id>/<table_id>/delete/low', methods=['POST', 'DELETE'])
+@requires_auth
 def delete_low_priority_flows(node_id, table_id):
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
@@ -535,6 +576,7 @@ def delete_low_priority_flows(node_id, table_id):
         flask.abort(404)
 
 @app.route('/flow/<node_id>/<table_id>/<flow_id>/delete', methods=['POST', 'DELETE'])
+@requires_auth
 def delete_flow(node_id, table_id, flow_id):
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)

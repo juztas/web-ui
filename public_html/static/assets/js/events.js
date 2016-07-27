@@ -105,6 +105,14 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "/api/routes/l2",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'source': source,
                           'destination': destination}),
     success: function (data) {
@@ -171,6 +179,14 @@ $("#ALTOTaskSubmissionModal").on('show.bs.modal', function (event) {
     method: 'GET',
     contentType: "application/json; charset=utf-8",
     url: "/api/spce/task/sites",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     success: function (data) {
       var servers = data['servers'];
       var clients = data['clients'];
@@ -211,6 +227,14 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "/api/routes/l3",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'source': source,
                           'destination': destination}),
     success: function (data) {
@@ -230,6 +254,14 @@ $("#ALTORouteManagementTab").click(function(e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "api/spce/path/retrieve",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({}),
     success: function (data) {
       alto_path_manager(data['paths']);
@@ -246,6 +278,14 @@ $("#ALTOTaskManagementTab").click(function (e) {
         type: "POST",
         contentType: "application/json; charset=utf-8",
         url: "api/spce/task/stat",
+        headers: {
+          "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+        },
+        statusCode: {
+          401: function() {
+            window.location.href = "/login.html";
+          }
+        },
         data: JSON.stringify({}),
         success: function (data) {
           alto_task_manager(data['tasks']);
@@ -285,6 +325,14 @@ $("#ALTORemoveRouteFormSubmit").click(function (e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "api/spce/path/remove",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'path': route}),
     success: function (data) {
       $('#ALTORouteRemoveModal').modal('hide');
@@ -309,6 +357,14 @@ $("#SPCESetupPathFormSubmit").click(function(e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "api/spce/path/setup",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'source': source,
                           'destination': destination,
                           'obj_metrics': obj_metrics,
@@ -334,6 +390,14 @@ $("#SPCERateLimitingFormSubmit").click(function(e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "api/spce/tc/set",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'source': source,
                           'destination': destination,
                           'bandwidth': bandwidth,
@@ -357,6 +421,14 @@ $("#ALTOTaskSubmissionFormSubmit").click(function (e) {
     type: "POST",
     contentType: "applicaiton/json; charset=utf-8",
     url: "api/spce/task/submit",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'source': source,
                           'destination': destination,
                           'source_file': source_file,
@@ -381,6 +453,14 @@ $("#ALTORemoveRateFormSubmit").click(function (e) {
     type: "POST",
     contentType: "application/json; charset=utf-8",
     url: "api/spce/tc/remove",
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     data: JSON.stringify({'path': route}),
     success: function (data) {
       $("#ALTORateRemoveModal").modal('hide');

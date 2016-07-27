@@ -115,6 +115,14 @@ var D3Force = function(nodes, links, div) {
         $.ajax({
             type: "GET",
             url: "/api/layout",
+            headers: {
+              "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+            },
+            statusCode: {
+              401: function() {
+                window.location.href = "/login.html";
+              }
+            },
             success: function(positions) {
                 _this.force.stop();
                 d3.selectAll(".node").each(function(node) {
@@ -144,6 +152,14 @@ var D3Force = function(nodes, links, div) {
             type: "POST",
             contentType: "application/json; charset=utf-8",
             url: "/api/layout",
+            headers: {
+              "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+            },
+            statusCode: {
+              401: function() {
+                window.location.href = "/login.html";
+              }
+            },
             data: JSON.stringify(positions),
             success: function(data) {
                 console.log("Saved layout");

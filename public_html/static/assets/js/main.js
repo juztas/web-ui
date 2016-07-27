@@ -131,6 +131,14 @@ function plot_flow(clean_flow_id, table_id, node_id) {
   $.ajax({
     url: "/api/flow/" + node_id + "/" + table_id + "/" + clean_flow_id,
     cache: false,
+    headers: {
+      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
     success: function(data) {
       console.log(data);
       /*
