@@ -18,6 +18,15 @@ d3.select('#load-layout').on('click', function() {
   chart.load_layout();
 });
 
+/* Toggle fixed positions */
+d3.select('#toggle-fixed-layout').on('click', function() {
+  chart.toggle_fixed_layout();
+  if (chart.fix_layout) {
+  } else {
+    d3.select('#toggle-fixed-layout i').attr('class', 'fa fa-toggle-off');
+  }
+});
+
 /* switch labels */
 d3.select('#change-switch-label-none').on('click', function() {
   chart.clear_switch_labels();
@@ -50,6 +59,9 @@ d3.select('#change-port-label-name').on('click', function() {
 });
 d3.select("#unused-ports-toggle").on('click', function() {
   chart.toggle_unused_ports();
+});
+d3.select("#unused-switches-toggle").on('click', function() {
+  chart.toggle_unused_switches();
 });
 
 /* host labels */

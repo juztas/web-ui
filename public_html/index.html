@@ -61,8 +61,18 @@
                   <div class="btn-group btn-group-sm" role="group" aria-label="...">
                     <button type="button" id="menu-toggle" class="btn btn-default"><i class="fa fa-fw fa-bars"></i> Toggle Menu</button>
                     <button type="button" id="zoom-mode" class="btn btn-default active"><i class="fa fa-search"></i> Zoom Mode</button>
-                    <button type="button" id="save-layout" class="btn btn-default"><i class="fa fa-cloud-upload"></i> Save Layout</button>
-                    <button type="button" id="load-layout" class="btn btn-default"><i class="fa fa-cloud-download"></i> Load Layout</button>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Layout
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a id="save-layout" href="#"><i class="fa fa-cloud-upload"></i> Save Layout</a></li>
+                        <li><a id="load-layout" href="#"><i class="fa fa-cloud-download"></i> Load Layout</a></li>
+                        <li><a id="toggle-fixed-layout" href="#"><i class="fa fa-toggle-on"></i> Toggle Fixed Layout</a></li>
+                      </ul>
+                    </div>
+
                     <div class="btn-group btn-group-sm" role="group">
                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         View
@@ -71,6 +81,7 @@
                       <ul class="dropdown-menu">
                         <li><a id="panel-toggle" href="#">Info Panel</a></li>
                         <li><a id="unused-ports-toggle" href="#">Toggle Unused Ports</a></li>
+                        <li><a id="unused-switches-toggle" href="#">Toggle Unused Switches</a></li>
                       </ul>
                     </div>
 
