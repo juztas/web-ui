@@ -53,10 +53,21 @@ var D3Force = function(nodes, links, div) {
     clearTimeout(task_management_timer);
   };
 
+  this.highlight_link = function(link) {
+    _this.fadein_all();
+    var d3link = d3.selectAll("." + link.type + "-link.link-id-" + link.id);
+    var d3source = d3.selectAll(".node." + link.source.type + "." + link.source.type + "-" + link.source.id.replace(/:/g, "\\\:"));
+    var d3target = d3.selectAll(".node." + link.target.type + "." + link.target.type + "-" + link.target.id.replace(/:/g, "\\\:"));
+    d3link.style("opacity", "1");
+    d3source.style("opacity", "1");
+    d3target.style("opacity", "1");
+    _this.show_link_details(link);
+  };
+
   this.highlight_switch = function(node) {
     _this.fadein_all();
-    var d3node = d3.selectAll(".node.switch.switch-" + node.id.replace(/:/g, "\\\:") + ", .node.ovs.ovs-" + node.id.replace(/:/g, "\\\:"))[0][0];
-    d3node.setAttribute("style", "opacity: 1");
+    var d3node = d3.selectAll(".node.switch.switch-" + node.id.replace(/:/g, "\\\:") + ", .node.ovs.ovs-" + node.id.replace(/:/g, "\\\:"));
+    d3node.style("opacity", "1");
     _this.show_node_details(node);
   };
 
@@ -72,14 +83,14 @@ var D3Force = function(nodes, links, div) {
       }
     }
 
-    var d3node = d3.selectAll(".node.port.port-" + port.id.replace(/:/g, "\\\:"))[0][0];
-    d3node.setAttribute("style", "opacity: 1");
+    var d3node = d3.selectAll(".node.port.port-" + port.id.replace(/:/g, "\\\:"));
+    d3node.style("opacity", "1");
   };
 
   this.highlight_host = function(node) {
     _this.fadein_all();
     var d3node = d3.selectAll(".node.host.host-" + node.id.replace(/:/g, "\\\:"))[0][0];
-    d3node.setAttribute("style", "opacity: 1");
+    d3node.style("opacity", "1");
     _this.show_node_details(node);
   };
 
@@ -112,6 +123,57 @@ var D3Force = function(nodes, links, div) {
         $('#node-details').html(template(context));
       });
     }
+  };
+
+  this.show_link_details = function(link) {
+    $("nav").show();
+    clear_pannel_info();
+
+    getTemplateAjax('link-details.handlebars', function(template) {
+      var saddr = link.source.type == "host" ? link.source['host-tracker-service:addresses'][0].ip : link.source.ip_address;
+      var taddr = link.target.type == "host" ? link.target['host-tracker-service:addresses'][0].ip : link.target.ip_address;
+      var tables = [];
+      var connectors = [];
+
+      if (link.source.tables) {
+        Object.values(link.source.tables).forEach(function(table) {
+          tables.push(table);
+        });
+      }
+      if (link.target.tables) {
+        Object.values(link.target.tables).forEach(function(table) {
+          tables.push(table);
+        });
+      }
+
+      if (link.source.connectors) {
+        Object.values(link.source.connectors).forEach(function(connector) {
+          connectors.push(connector);
+        });
+      }
+      if (link.target.connectors) {
+        Object.values(link.target.connectors).forEach(function(connector) {
+          connectors.push(connector);
+        });
+      }
+
+      var context = {
+        'sid': link.source.id,
+        'stype': link.source.type,
+        'saddr': saddr,
+        'tid': link.target.id,
+        'ttype': link.target.type,
+        'taddr': taddr,
+        'capacity': link.capacity,
+        'tables': tables,
+        'connectors': connectors
+      };
+      if (link.source_port)
+        context.sport = link.source_port.id;
+      if (link.target_port)
+        context.tport = link.target_port.id;
+      $('#node-details').html(template(context));
+    });
   };
 
   this.load_layout = function() {
@@ -344,7 +406,7 @@ var D3Force = function(nodes, links, div) {
   this.ports = [];
 
   var filteredLinks = [];
-  this.links.forEach(function(link) {
+  this.links.forEach(function(link, index) {
     if (link.type === "link" || link.type === "host") {
       if (link.source.type === "port") {
         link.source_port = link.source;
@@ -355,6 +417,7 @@ var D3Force = function(nodes, links, div) {
         _this.ports.push(link.target_port);
         link.target = nodes[link.target.id.split(':').slice(0, 2).join(':')];
       }
+      link.id = index;
       filteredLinks.push(link);
     }
   });
@@ -425,6 +488,7 @@ var D3Force = function(nodes, links, div) {
     .attr("class", function(d) {
       return d.type + "-link" +
         " " + d.capacity + "-link" +
+        " link-id-" + d.id +
         ((d.type === "link" || d.type === "host") ?
          (
            d.source.type === "host" ?
@@ -437,7 +501,8 @@ var D3Force = function(nodes, links, div) {
              " link-" + d.target['host-tracker-service:addresses'][0].ip :
              " link-" + d.target_port.id
          ) : "");
-    });
+    })
+    .on("click", onclick);
 
 
   this.node = this.svg.selectAll(".node")
@@ -492,13 +557,15 @@ var D3Force = function(nodes, links, div) {
 
   function onclick() {
     var element = d3.select(this);
-    var node = element[0][0].__data__;
-    if (node.type == "switch" || node.type == "ovs") {
-      _this.highlight_switch(node);
-    } else if (node.type == "port") {
-      _this.highlight_port(node);
-    } else if (node.type == "host") {
-      _this.highlight_host(node);
+    var data = element[0][0].__data__;
+    if (data.capacity) {
+      _this.highlight_link(data);
+    } else if (data.type == "switch" || data.type == "ovs") {
+      _this.highlight_switch(data);
+    } else if (data.type == "port") {
+      _this.highlight_port(data);
+    } else if (data.type == "host") {
+      _this.highlight_host(data);
     }
   }
 
