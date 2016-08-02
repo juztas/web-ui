@@ -240,6 +240,10 @@ a {
     text-decoration: none;
 }
 
+.modal {
+  color: black;
+}
+
 #plot-flow-d3.fullscreen{
     z-index: 9999; 
     width: 100%; 

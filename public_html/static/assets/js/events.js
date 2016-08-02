@@ -181,6 +181,19 @@ $('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', fu
     }
   }
 
+  var enable = modal.find("#enable-rate-limit");
+  var rl = modal.find("#rate-limit");
+  var bs = modal.find("#burst-size");
+  enable.change(function(e) {
+    if (enable.prop('checked')) {
+      rl.prop('disabled', false);
+      bs.prop('disabled', false);
+    } else {
+      rl.prop('disabled', true);
+      bs.prop('disabled', true);
+    }
+  });
+
 });
 
 $("#ALTOTaskSubmissionModal").on('show.bs.modal', function (event) {
@@ -364,6 +377,9 @@ $("#SPCESetupPathFormSubmit").click(function(e) {
                      {'metric': 'bandwidth',
                       'min': parseInt(modal.find("#min-bandwidth").val()) || 0,
                       'max': parseInt(modal.find("#max-bandwidth").val()) || 100000000000}];
+  var en_rl = modal.find("#enable-rate-limit").prop('checked');
+  var bw = parseInt(modal.find("#rate-limit").val()) || 1000000;
+  var bs = parseInt(modal.find("#burst-size").val()) || bw;
 
   $.ajax({
     type: "POST",
@@ -384,7 +400,33 @@ $("#SPCESetupPathFormSubmit").click(function(e) {
     success: function (data) {
       modal.modal('hide');
       // TODO: feedback
-      $("#ALTORouteManagementTab").click();
+      if (!en_rl) {
+        $("#ALTORouteManagementTab").click();
+      } else {
+        $.ajax({
+          type: "POST",
+          contentType: "application/json; charset=utf-8",
+          url: "api/spce/tc/set",
+          headers: {
+            "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+          },
+          statusCode: {
+            401: function() {
+              window.location.href = "/login.html";
+            }
+          },
+          data: JSON.stringify({'source': source,
+                                'destination': destination,
+                                'bandwidth': bw,
+                                'bs': bs,
+                                'operation': 'create'}),
+          success: function (data) {
+            modal.modal('hide');
+            $("#ALTORouteManagementTab").click();
+          },
+          dataType: "json"
+        });
+      }
     },
     dataType: "json"
   });
