@@ -38,7 +38,17 @@
       <div id="page-content-wrapper">
         <div class="container-fluid">
           <div class="row">
-              <div id="main"></div>
+            <div class="col-md-12 right">
+              <label class="checkbox-inline">
+                <input type="checkbox" checked="checked" id="to-switch-flows" value="to-switch">
+                to-switch flows
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" checked="checked" id="to-controller-flows" value="to-controller">
+                to-controller flows
+              </label>
+            </div>
+            <div id="main"></div>
           </div>
         </div> <!-- /.container-fluid -->
       </div> <!-- /#page-content-wrapper -->
@@ -85,8 +95,21 @@
             getTemplateAjax('flows.handlebars', function(template) {
               var context = {'switch': switches};
               $('#main').html(template(context));
-              $('#flowsTable').DataTable({
-                'pageLength': 100
+              var table = $('#flowsTable').DataTable({
+                'pageLength': 100,
+                'initComplete': function() {
+                }
+              });
+              $('#to-switch-flows, #to-controller-flows').change(function() {
+                var relist = [];
+                if ($('#to-switch-flows').prop('checked')) {
+                  relist.push('(?!CONTROLLER)[a-zA-Z0-9]*');
+                }
+                if ($('#to-controller-flows').prop('checked')) {
+                  relist.push('CONTROLLER');
+                }
+                var regex = '^.*output-action:(' + relist.join('|') + ')(|,.*)$';
+                table.columns(12).search(regex, true, false).draw();
               });
               $('#waiting-dialog').modal('hide');
             });
