@@ -136,24 +136,24 @@ var D3Force = function(nodes, links, div) {
       var connectors = [];
 
       if (link.source.tables) {
-        Object.values(link.source.tables).forEach(function(table) {
-          tables.push(table);
+        Object.keys(link.source.tables).forEach(function(id) {
+          tables.push(link.source.tables[id]);
         });
       }
       if (link.target.tables) {
-        Object.values(link.target.tables).forEach(function(table) {
-          tables.push(table);
+        Object.keys(link.target.tables).forEach(function(id) {
+          tables.push(link.target.tables[id]);
         });
       }
 
       if (link.source.connectors) {
-        Object.values(link.source.connectors).forEach(function(connector) {
-          connectors.push(connector);
+        Object.keys(link.source.connectors).forEach(function(id) {
+          connectors.push(link.source.connectors[id]);
         });
       }
       if (link.target.connectors) {
-        Object.values(link.target.connectors).forEach(function(connector) {
-          connectors.push(connector);
+        Object.keys(link.target.connectors).forEach(function(id) {
+          connectors.push(link.target.connectors[id]);
         });
       }
 
