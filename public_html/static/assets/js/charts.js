@@ -486,6 +486,29 @@ var D3Force = function(nodes, links, div) {
     .data(this.force.links())
     .enter().append("line")
     .attr("class", function(d) {
+      return "transparent-link" +
+        " link-id-" + d.id +
+        ((d.type === "link" || d.type === "host") ?
+         (
+           d.source.type === "host" ?
+             " link-" + d.source.id +
+             " link-" + d.source['host-tracker-service:addresses'][0].ip :
+             " link-" + d.source_port.id
+         ) + (
+           d.target.type === "host" ?
+             " link-" + d.target.id +
+             " link-" + d.target['host-tracker-service:addresses'][0].ip :
+             " link-" + d.target_port.id
+         ) : "");
+    })
+    .style("opacity", 1.0)
+    .on("click", onclick);
+
+  this.show_link = this.svg.selectAll(".link")
+    .data(this.force.links())
+    .enter().append("line")
+    .attr('pointer-events', 'all')
+    .attr("class", function(d) {
       return d.type + "-link" +
         " " + d.capacity + "-link" +
         " link-id-" + d.id +
@@ -501,9 +524,7 @@ var D3Force = function(nodes, links, div) {
              " link-" + d.target['host-tracker-service:addresses'][0].ip :
              " link-" + d.target_port.id
          ) : "");
-    })
-    .on("click", onclick);
-
+    });
 
   this.node = this.svg.selectAll(".node")
     .data(this.force.nodes())
@@ -524,6 +545,20 @@ var D3Force = function(nodes, links, div) {
 
   function tick() {
     _this.link
+      .attr("x1", function(d) {
+        return d.source.x;
+      })
+      .attr("y1", function(d) {
+        return d.source.y;
+      })
+      .attr("x2", function(d) {
+        return d.target.x;
+      })
+      .attr("y2", function(d) {
+        return d.target.y;
+      });
+
+    _this.show_link
       .attr("x1", function(d) {
         return d.source.x;
       })

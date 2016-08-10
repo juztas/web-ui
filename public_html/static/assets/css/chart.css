@@ -32,6 +32,11 @@
   stroke: #CC6666
 }
 
+.transparent-link {
+  fill: none;
+  stroke-width: 50px;
+}
+
 .switch-circle {
   //fill: #CCFFFF;
   stroke: #99CCCC;

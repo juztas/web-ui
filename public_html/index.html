@@ -624,6 +624,7 @@ information: <br><br>
   </div>
 </div>
 
+    <script src="/static/assets/templates/test_tt.js"></script>
     <script language="javascript">
       $(document).ready(function() {
 
@@ -636,6 +637,11 @@ information: <br><br>
           statusCode: {
             401: function() {
               window.location.href = "/login.html";
+            },
+            404: function() {
+              chart = new D3Force(test_tt['nodes'],
+                                  test_tt['links'],
+                                  "#graph");
             }
           },
           success: function (topology) {
