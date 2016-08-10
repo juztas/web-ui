@@ -32,6 +32,8 @@
     <script src="/static/assets/js/bootstrap.min.js"></script>
     <script src="/static/assets/js/handlebars.min-latest.js"></script>
 
+    <script src="/static/assets/templates/test_tt.js"></script>
+    <script src="/static/assets/templates/test_layout.js"></script>
     <script src="/static/assets/js/charts.js"></script>
     <script src="/static/assets/js/main.js"></script>
 
@@ -97,6 +99,7 @@
                         <li><a id="change-switch-label-address" href="#">IP Address</a></li>
                         <li><a id="change-switch-label-manufacturer" href="#">Manufacturer</a></li>
                         <li><a id="change-switch-label-hardware" href="#">Hardware</a></li>
+                        <li><a id="change-switch-label-customize" href="#">Customized Name</a></li>
                       </ul>
                     </div>
 
@@ -121,6 +124,7 @@
                         <li><a id="change-host-label-id" href="#">Host ID</a></li>
                         <li><a id="change-host-label-ip" href="#">Host IP</a></li>
                         <li><a id="change-host-label-mac" href="#">Host MAC</a></li>
+                        <li><a id="change-host-label-customize" href="#">Customized Name</a></li>
                       </ul>
                     </div>
                   </div>
@@ -624,7 +628,6 @@ information: <br><br>
   </div>
 </div>
 
-    <script src="/static/assets/templates/test_tt.js"></script>
     <script language="javascript">
       $(document).ready(function() {
 
@@ -642,6 +645,7 @@ information: <br><br>
               chart = new D3Force(test_tt['nodes'],
                                   test_tt['links'],
                                   "#graph");
+              chart.load_layout();
             }
           },
           success: function (topology) {

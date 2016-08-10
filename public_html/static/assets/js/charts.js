@@ -89,7 +89,7 @@ var D3Force = function(nodes, links, div) {
 
   this.highlight_host = function(node) {
     _this.fadein_all();
-    var d3node = d3.selectAll(".node.host.host-" + node.id.replace(/:/g, "\\\:"))[0][0];
+    var d3node = d3.selectAll(".node.host.host-" + node.id.replace(/:/g, "\\\:"));
     d3node.style("opacity", "1");
     _this.show_node_details(node);
   };
@@ -103,6 +103,12 @@ var D3Force = function(nodes, links, div) {
       getTemplateAjax('switch-details.handlebars', function(template) {
         var context = node;
         $('#node-details').html(template(context));
+        _this.customize_name();
+        $('#customize-name').keypress(function (e) {
+          if (e.which == 13) {
+            _this.set_customize_name();
+          }
+        });
       });
     } else if (node.type == "host") {
       getTemplateAjax('host-details.handlebars', function(template) {
@@ -121,6 +127,12 @@ var D3Force = function(nodes, links, div) {
           'attachment_switch': attachment_switch
         };
         $('#node-details').html(template(context));
+        _this.customize_name();
+        $('#customize-name').keypress(function (e) {
+          if (e.which == 13) {
+            _this.set_customize_name();
+          }
+        });
       });
     }
   };
@@ -187,6 +199,10 @@ var D3Force = function(nodes, links, div) {
       statusCode: {
         401: function() {
           window.location.href = "/login.html";
+        },
+        404: function() {
+          _this.positions_cache = test_layout;
+          _this.load_layout_from_positions(_this.positions_cache);
         }
       },
       success: function(positions) {
@@ -219,6 +235,8 @@ var D3Force = function(nodes, links, div) {
     d3.selectAll(".node").each(function(d) {
       positions[d.id] = [d.x, d.y];
     });
+
+    _this.positions_cache = positions;
 
     // Remote Store
     $.ajax({
@@ -265,6 +283,14 @@ var D3Force = function(nodes, links, div) {
       .attr("class", "switch-label")
       .attr("text-anchor", "middle")
       .text(function(d) {
+        if (type == 'customize') {
+          if (_this.positions_cache &&
+              _this.positions_cache[d.id] &&
+              _this.positions_cache[d.id][2]) {
+            return _this.positions_cache[d.id][2];
+          }
+          return "NoName " + d.index;
+        }
         return d[type];
       });
   };
@@ -287,6 +313,14 @@ var D3Force = function(nodes, links, div) {
       .attr("class", "host-label")
       .attr("text-anchor", "middle")
       .text(function(d) {
+        if (type == 'customize') {
+          if (_this.positions_cache &&
+              _this.positions_cache[d.id] &&
+              _this.positions_cache[d.id][2]) {
+            return _this.positions_cache[d.id][2];
+          }
+          return "NoName " + d.index;
+        }
         return d['host-tracker-service:addresses'][0][type];
       });
   };
@@ -314,6 +348,28 @@ var D3Force = function(nodes, links, div) {
   this.clear_port_labels = function() {
     var labels = d3.selectAll(".port-label");
     labels.remove();
+  };
+
+  this.customize_name = function() {
+    var input = $("#customize-name");
+    var id = input.data("id");
+    if (_this.positions_cache &&
+        _this.positions_cache[id] &&
+       _this.positions_cache[id][2])
+      input.val(_this.positions_cache[id][2]);
+  };
+
+  this.set_customize_name = function() {
+    var input = $("#customize-name");
+    var id = input.data("id");
+    var name = input.val();
+    if (!_this.positions_cache) {
+      _this.positions_cache = {};
+    }
+    if (!_this.positions_cache[id]) {
+      _this.positions_cache[id] = [];
+    }
+    _this.positions_cache[id][2] = name;
   };
 
   this.toggle_node_display = function(node) {

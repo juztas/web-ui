@@ -44,8 +44,11 @@ d3.select('#change-switch-label-manufacturer').on('click', function() {
   chart.show_switch_labels('manufacturer');
 });
 d3.select('#change-switch-label-hardware').on('click', function() {
-    chart.show_switch_labels('hardware');
+  chart.show_switch_labels('hardware');
 });
+d3.select('#change-switch-label-customize').on('click', function() {
+  chart.show_switch_labels('customize');
+})
 
 /* port labels */
 d3.select('#change-port-label-none').on('click', function() {
@@ -73,6 +76,9 @@ d3.select('#change-host-label-ip').on('click', function() {
 });
 d3.select('#change-host-label-mac').on('click', function() {
   chart.show_host_labels('mac');
+});
+d3.select('#change-host-label-customize').on('click', function() {
+  chart.show_host_labels('customize');
 });
 
 $('#L2RouteCalculationModal').on('show.bs.modal', function (event) {
