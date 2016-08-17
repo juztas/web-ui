@@ -48,7 +48,7 @@ d3.select('#change-switch-label-hardware').on('click', function() {
 });
 d3.select('#change-switch-label-customize').on('click', function() {
   chart.show_switch_labels('customize');
-})
+});
 
 /* port labels */
 d3.select('#change-port-label-none').on('click', function() {
@@ -124,7 +124,7 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
     contentType: "application/json; charset=utf-8",
     url: "/api/routes/l2",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -211,7 +211,7 @@ $("#ALTOTaskSubmissionModal").on('show.bs.modal', function (event) {
     contentType: "application/json; charset=utf-8",
     url: "/api/spce/task/sites",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -259,7 +259,7 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
     contentType: "application/json; charset=utf-8",
     url: "/api/routes/l3",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -286,7 +286,7 @@ $("#ALTORouteManagementTab").click(function(e) {
     contentType: "application/json; charset=utf-8",
     url: "api/spce/path/retrieve",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -310,7 +310,7 @@ $("#ALTOTaskManagementTab").click(function (e) {
         contentType: "application/json; charset=utf-8",
         url: "api/spce/task/stat",
         headers: {
-          "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+          "Authorization": "Basic " + (Cookies.get('auth') || "")
         },
         statusCode: {
           401: function() {
@@ -357,7 +357,7 @@ $("#ALTORemoveRouteFormSubmit").click(function (e) {
     contentType: "application/json; charset=utf-8",
     url: "api/spce/path/remove",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -392,7 +392,7 @@ $("#SPCESetupPathFormSubmit").click(function(e) {
     contentType: "application/json; charset=utf-8",
     url: "api/spce/path/setup",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -414,7 +414,7 @@ $("#SPCESetupPathFormSubmit").click(function(e) {
           contentType: "application/json; charset=utf-8",
           url: "api/spce/tc/set",
           headers: {
-            "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+            "Authorization": "Basic " + (Cookies.get('auth') || "")
           },
           statusCode: {
             401: function() {
@@ -451,7 +451,7 @@ $("#SPCERateLimitingFormSubmit").click(function(e) {
     contentType: "application/json; charset=utf-8",
     url: "api/spce/tc/set",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -482,7 +482,7 @@ $("#ALTOTaskSubmissionFormSubmit").click(function (e) {
     contentType: "applicaiton/json; charset=utf-8",
     url: "api/spce/task/submit",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {
@@ -514,7 +514,7 @@ $("#ALTORemoveRateFormSubmit").click(function (e) {
     contentType: "application/json; charset=utf-8",
     url: "api/spce/tc/remove",
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {

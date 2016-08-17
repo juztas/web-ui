@@ -30,6 +30,7 @@
     <script src="/static/assets/js/jquery.dataTables.min.js"></script>
     <script src="/static/assets/js/bootstrap.min.js"></script>
     <script src="/static/assets/js/handlebars.min-latest.js"></script>
+    <script src="/static/assets/js/js.cookie.js"></script>
 
     <script src="/static/assets/js/main.js"></script>
 
@@ -65,7 +66,7 @@
           type: "GET",
           url: "/api/topology",
           headers: {
-            "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+            "Authorization": "Basic " + (Cookies.get('auth') || "")
           },
           statusCode: {
             401: function() {

@@ -28,6 +28,7 @@
     <script src="/static/assets/js/jquery-1.11.3.min.js"></script>
     <script src="/static/assets/js/d3.min.js"></script>
     <script src="/static/assets/js/bootstrap.min.js"></script>
+    <script src="/static/assets/js/js.cookie.js"></script>
 
     <div class="modal show" style="margin-top: 5%;" id="loginModal" tabindex="-1">
       <div class="modal-dialog" role="document">
@@ -75,7 +76,7 @@
            "Authorization": "Basic " + auth
          },
          success: function (data) {
-           sessionStorage.setItem('auth', auth);
+           Cookies.set('auth', auth);
            window.location.href = "/index.html";
          },
          error: function () {

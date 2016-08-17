@@ -132,7 +132,7 @@ function plot_flow(clean_flow_id, table_id, node_id) {
     url: "/api/flow/" + node_id + "/" + table_id + "/" + clean_flow_id,
     cache: false,
     headers: {
-      "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
     statusCode: {
       401: function() {

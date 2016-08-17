@@ -38,6 +38,9 @@ var D3Force = function(nodes, links, div) {
 
   var positions_cache;
 
+  this.switch_labels_type = "ip_address";
+  this.host_labels_type = "ip";
+
   var fix_layout = true;
 
   this.fadein_all = function() {
@@ -107,6 +110,15 @@ var D3Force = function(nodes, links, div) {
         $('#customize-name').keypress(function (e) {
           if (e.which == 13) {
             _this.set_customize_name();
+            if (_this.switch_labels_type == 'customize') {
+              _this.show_switch_labels('customize');
+            }
+          }
+        });
+        $('#customize-name-apply').click(function (e) {
+          _this.set_customize_name();
+          if (_this.switch_labels_type == 'customize') {
+            _this.show_switch_labels('customize');
           }
         });
       });
@@ -131,6 +143,15 @@ var D3Force = function(nodes, links, div) {
         $('#customize-name').keypress(function (e) {
           if (e.which == 13) {
             _this.set_customize_name();
+            if (_this.host_labels_type == 'customize') {
+              _this.show_host_labels('customize');
+            }
+          }
+        });
+        $('#customize-name-apply').click(function (e) {
+          _this.set_customize_name();
+          if (_this.host_labels_type == 'customize') {
+            _this.show_host_labels('customize');
           }
         });
       });
@@ -194,7 +215,7 @@ var D3Force = function(nodes, links, div) {
       type: "GET",
       url: "/api/layout",
       headers: {
-        "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+        "Authorization": "Basic " + (Cookies.get('auth') || "")
       },
       statusCode: {
         401: function() {
@@ -244,7 +265,7 @@ var D3Force = function(nodes, links, div) {
       contentType: "application/json; charset=utf-8",
       url: "/api/layout",
       headers: {
-        "Authorization": "Basic " + (sessionStorage.getItem('auth') || "")
+        "Authorization": "Basic " + (Cookies.get('auth') || "")
       },
       statusCode: {
         401: function() {
@@ -293,6 +314,8 @@ var D3Force = function(nodes, links, div) {
         }
         return d[type];
       });
+
+    _this.switch_labels_type = type;
   };
 
   this.clear_switch_labels = function() {
@@ -323,6 +346,8 @@ var D3Force = function(nodes, links, div) {
         }
         return d['host-tracker-service:addresses'][0][type];
       });
+
+    _this.host_labels_type = type;
   };
 
   this.clear_host_labels = function() {
@@ -712,7 +737,7 @@ var D3Force = function(nodes, links, div) {
   for (var i = 10000000/**tick_times * tick_times * tick_times * tick_times**/; i > 0; --i) this.force.tick();
   this.force.stop();
 
-  this.show_switch_labels("ip_address");
-  this.show_host_labels("ip");
+  this.show_switch_labels(this.switch_labels_type);
+  this.show_host_labels(this.host_labels_type);
   this.show_port_labels("port_number");
 };
