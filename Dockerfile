@@ -12,7 +12,7 @@ MAINTAINER Jensen Zhang <jingxuan.n.zhang@gmail.com>
 RUN apt-get update
 
 # Install basic applications
-RUN apt-get install -y tar git curl vim wget dialog net-tools build-essential
+RUN apt-get install -y tar git curl vim wget dialog net-tools build-essential supervisor
 
 # Install Python and Basic Python Tools
 RUN apt-get install -y python python-dev python-distribute python-pip librrd-dev
@@ -31,4 +31,7 @@ ADD requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 RUN git clone https://github.com/snlab/python-odl.git && cd python-odl && python setup.py install
 
-CMD service apache2 restart
+# Supervisor configuration for apache2
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor
+COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["/usr/bin/supervisord"]
