@@ -34,6 +34,8 @@ var D3Force = function(nodes, links, div) {
     'host': 5 * size['port']
   };
 
+  var THETA = Math.PI/9;
+
   var tick_times = 100;
 
   var positions_cache;
@@ -42,6 +44,8 @@ var D3Force = function(nodes, links, div) {
   this.host_labels_type = "ip";
 
   var fix_layout = true;
+
+  var pathgen = d3.svg.line().interpolate("basis");
 
   this.fadein_all = function() {
     d3.selectAll(".node").style("opacity", "0.3");
@@ -489,6 +493,12 @@ var D3Force = function(nodes, links, div) {
   var filteredLinks = [];
   this.links.forEach(function(link, index) {
     if (link.type === "link" || link.type === "host") {
+      // Make source always less than target
+      // if (link.source.id > link.target.id) {
+      //   var tmp = link.source;
+      //   link.source = link.target;
+      //   link.target = tmp;
+      // }
       if (link.source.type === "port") {
         link.source_port = link.source;
         link.source = nodes[link.source.id.split(':').slice(0, 2).join(':')];
@@ -503,20 +513,60 @@ var D3Force = function(nodes, links, div) {
     }
   });
 
+  filteredLinks.sort(function(a, b) {
+    if (a.source.id > b.source.id) {
+      return 1;
+    } else if (a.source.id < b.source.id) {
+      return -1;
+    } else {
+      if (a.target.id > b.target.id) {
+        return 1;
+      } else if (a.target.id < b.target.id) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+  });
+
+  var begin = null;
+  for (var i=0; i<filteredLinks.length; i++) {
+    if (i != 0 &&
+        filteredLinks[i].source.id == filteredLinks[i-1].source.id &&
+        filteredLinks[i].target.id == filteredLinks[i-1].target.id) {
+      // NOOP
+    } else {
+      if (begin != null) {
+        var linknum = i - begin;
+        for (var j=begin; j<i; j++) {
+          filteredLinks[j].theta = (linknum - 1 - 2*j + 2*begin) * THETA / 2;
+        }
+      }
+      begin = i;
+    }
+  }
+  if (begin) {
+    var linknum = i - begin;
+    for (var j=begin; j<i; j++) {
+      filteredLinks[j].theta = (linknum - 1 - 2*j + 2*begin) * THETA / 2;
+    }
+  }
+
   this.force = d3.layout.force()
   //  .nodes(d3.values(this.nodes))
   //  .links(this.links)
     .nodes(filteredNodes)
     .links(filteredLinks)
     .size([this.width, this.height])
-  // .gravity(0.015)
+    .gravity(1.0)
     .linkStrength(function(d) {
       return strength[d.type];
     })
     .linkDistance(function(d) {
       return distance[d.type];
     })
-    .charge( /**function(d) { return charge[d.type]; }**/ -1800)
+    .charge( /**function(d) { return charge[d.type]; }**/ -20000)
+    .friction(0.7)
     .on("tick", tick)
     .start();
 
@@ -565,7 +615,7 @@ var D3Force = function(nodes, links, div) {
 
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
-    .enter().append("line")
+    .enter().append("path")
     .attr("class", function(d) {
       return "transparent-link" +
         " link-id-" + d.id +
@@ -587,7 +637,7 @@ var D3Force = function(nodes, links, div) {
 
   this.show_link = this.svg.selectAll(".link")
     .data(this.force.links())
-    .enter().append("line")
+    .enter().append("path")
     .attr('pointer-events', 'all')
     .attr("class", function(d) {
       return d.type + "-link" +
@@ -625,40 +675,45 @@ var D3Force = function(nodes, links, div) {
     });
 
   function tick() {
+    var seenPort = {};
+
     _this.link
-      .attr("x1", function(d) {
-        return d.source.x;
-      })
-      .attr("y1", function(d) {
-        return d.source.y;
-      })
-      .attr("x2", function(d) {
-        return d.target.x;
-      })
-      .attr("y2", function(d) {
-        return d.target.y;
+      .attr("d", function(d) {
+        var linedata = [[d.source.x, d.source.y]];
+        var linelen = Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2));
+        // Distribute switch ports
+        if (d.source_port) {
+          if (!seenPort[d.source_port.id]) {
+            d.source_port.x = d.source.x + ((d.target.x - d.source.x) * Math.cos(d.theta) - (d.target.y - d.source.y) * Math.sin(d.theta)) * size.switch / linelen;
+            d.source_port.y = d.source.y + ((d.target.x - d.source.x) * Math.sin(d.theta) + (d.target.y - d.source.y) * Math.cos(d.theta)) * size.switch / linelen;
+            seenPort[d.source_port.id] = true;
+          }
+          linedata.push([d.source_port.x, d.source_port.y]);
+        }
+        if (d.target_port) {
+          if (!seenPort[d.target_port.id]) {
+            d.target_port.x = d.target.x + ((d.source.x - d.target.x) * Math.cos(-d.theta) - (d.source.y - d.target.y) * Math.sin(-d.theta)) * size.switch / linelen;
+            d.target_port.y = d.target.y + ((d.source.x - d.target.x) * Math.sin(-d.theta) + (d.source.y - d.target.y) * Math.cos(-d.theta)) * size.switch / linelen;
+            seenPort[d.target_port.id] = true;
+          }
+          linedata.push([d.target_port.x, d.target_port.y]);
+        }
+        linedata.push([d.target.x, d.target.y]);
+        return pathgen(linedata);
       });
 
     _this.show_link
-      .attr("x1", function(d) {
-        return d.source.x;
-      })
-      .attr("y1", function(d) {
-        return d.source.y;
-      })
-      .attr("x2", function(d) {
-        return d.target.x;
-      })
-      .attr("y2", function(d) {
-        return d.target.y;
+      .attr("d", function(d) {
+        var linedata = [[d.source.x, d.source.y]];
+        if (d.source_port) {
+          linedata.push([d.source_port.x, d.source_port.y]);
+        }
+        if (d.target_port) {
+          linedata.push([d.target_port.x, d.target_port.y]);
+        }
+        linedata.push([d.target.x, d.target.y]);
+        return pathgen(linedata);
       });
-
-    _this.link.each(function(d) {
-      if (d.target_port) {
-        d.target_port.x = d.target.x - ((d.target.x - d.source.x) * size.switch) / (Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2)));
-        d.target_port.y = d.target.y - ((d.target.y - d.source.y) * size.switch) / (Math.sqrt(Math.pow(d.target.y - d.source.y, 2) + Math.pow(d.target.x - d.source.x, 2)));
-      }
-    });
 
     _this.node
       .attr("transform", function(d) {

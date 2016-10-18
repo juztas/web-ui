@@ -75,11 +75,6 @@ node {
   font-size: 12px;
 }
 
-path.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
 .axis path,
 .axis line {
   fill: none;
@@ -97,12 +92,6 @@ path.link {
 
 .line2 {
   stroke: lightgreen;
-}
-
-path {
-    stroke: steelblue;
-    stroke-width: 2;
-    fill: none;
 }
 
 .area {
