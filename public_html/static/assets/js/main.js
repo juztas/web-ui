@@ -1,3 +1,6 @@
+var toggle_task_timer = false;
+var task_management_timer = {};
+
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
   var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),

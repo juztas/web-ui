@@ -44,6 +44,7 @@ var D3Force = function(nodes, links, div) {
   this.host_labels_type = "ip";
 
   var fix_layout = true;
+  var lock_highlight = false;
 
   var pathgen = d3.svg.line().interpolate("basis");
 
@@ -54,10 +55,11 @@ var D3Force = function(nodes, links, div) {
 
   this.fadeout_all = function() {
     d3.selectAll(".node").style("opacity", "1");
-    d3.selectAll(".link-link").style("opacity", "1");
+    d3.selectAll(".link-link").style("opacity", "1").style("cursor", null);
     $("nav").hide();
     toggle_task_timer = false;
     clearTimeout(task_management_timer);
+    lock_highlight = false;
   };
 
   this.highlight_link = function(link) {
@@ -65,10 +67,9 @@ var D3Force = function(nodes, links, div) {
     var d3link = d3.selectAll("." + link.type + "-link.link-id-" + link.id);
     var d3source = d3.selectAll(".node." + link.source.type + "." + link.source.type + "-" + link.source.id.replace(/:/g, "\\\:"));
     var d3target = d3.selectAll(".node." + link.target.type + "." + link.target.type + "-" + link.target.id.replace(/:/g, "\\\:"));
-    d3link.style("opacity", "1");
+    d3link.style("opacity", "1").style("cursor", "pointer");
     d3source.style("opacity", "1");
     d3target.style("opacity", "1");
-    _this.show_link_details(link);
   };
 
   this.highlight_switch = function(node) {
@@ -103,6 +104,7 @@ var D3Force = function(nodes, links, div) {
 
   this.show_node_details = function(node) {
     /* TODO: Maybe this function should not be here. */
+    lock_highlight = true;
     $("nav").show();
     clear_pannel_info();
 
@@ -163,23 +165,34 @@ var D3Force = function(nodes, links, div) {
   };
 
   this.show_link_details = function(link) {
+    lock_highlight = true;
     $("nav").show();
     clear_pannel_info();
 
     getTemplateAjax('link-details.handlebars', function(template) {
       var saddr = link.source.type == "host" ? link.source['host-tracker-service:addresses'][0].ip : link.source.ip_address;
       var taddr = link.target.type == "host" ? link.target['host-tracker-service:addresses'][0].ip : link.target.ip_address;
-      var tables = [];
+      var flows = [];
       var connectors = [];
 
-      if (link.source.tables) {
+      if (link.source.tables && link.source_port) {
         Object.keys(link.source.tables).forEach(function(id) {
-          tables.push(link.source.tables[id]);
+          var sflows = link.source.tables[id].flows;
+          Object.keys(sflows).forEach(function(id) {
+            if (sflows[id].actions.filter(function(d) {return d.value == link.source_port.port_number;}).length) {
+              flows.push(sflows[id]);
+            }
+          });
         });
       }
-      if (link.target.tables) {
+      if (link.target.tables && link.target_port) {
         Object.keys(link.target.tables).forEach(function(id) {
-          tables.push(link.target.tables[id]);
+          var tflows = link.target.tables[id].flows;
+          Object.keys(tflows).forEach(function(id) {
+            if (tflows[id].actions.filter(function(d) {return d.value == link.target_port.port_number;}).length) {
+              flows.push(tflows[id]);
+            }
+          });
         });
       }
 
@@ -202,7 +215,7 @@ var D3Force = function(nodes, links, div) {
         'ttype': link.target.type,
         'taddr': taddr,
         'capacity': link.capacity,
-        'tables': tables,
+        'flows': flows,
         'connectors': connectors
       };
       if (link.source_port)
@@ -633,7 +646,19 @@ var D3Force = function(nodes, links, div) {
          ) : "");
     })
     .style("opacity", 1.0)
-    .on("click", onclick);
+    .on("click", onclick)
+    .on("mouseover", function() {
+      if (!lock_highlight) {
+        var data = d3.select(this)[0][0].__data__;
+        _this.highlight_link(data);
+      }
+    })
+    .on("mouseout", function() {
+      if (!lock_highlight) {
+        var data = d3.select(this)[0][0].__data__;
+        _this.fadeout_all();
+      }
+    });
 
   this.show_link = this.svg.selectAll(".link")
     .data(this.force.links())
@@ -731,6 +756,7 @@ var D3Force = function(nodes, links, div) {
     var data = element[0][0].__data__;
     if (data.capacity) {
       _this.highlight_link(data);
+      _this.show_link_details(data);
     } else if (data.type == "switch" || data.type == "ovs") {
       _this.highlight_switch(data);
     } else if (data.type == "port") {
