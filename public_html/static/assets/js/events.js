@@ -537,6 +537,13 @@ $('#PathFlowsConfirmationModal').on('show.bs.modal', function (event) {
   var type = modal.find("#type")[0].value;
   var endpoint = "/api/flow/path/" + type + "/" + path_id;
   modal.find("#PathFlowsInstallForm").attr("action", endpoint);
+
+  modal.find("#PathFlowsInstallForm").submit(function(event) {
+    event.preventDefault();
+    var form = $(this);
+    var data = {};
+    submitFormData(endpoint, data);
+  });
 });
 
 $('#FlowRemoveModal').on('show.bs.modal', function (event) {
@@ -554,6 +561,16 @@ $('#FlowRemoveModal').on('show.bs.modal', function (event) {
 
   $('#flowid').text(flow_id);
   $('#flowname').text(flow_name);
+
+  modal.find("#RemoveFlowForm").submit(function(event) {
+    event.preventDefault();
+    var form = $(this);
+    var data = {
+      'delete_all': form.find("#delete_all").val()
+    };
+    submitFormData(endpoint, data);
+  });
+
 });
 
 $('#FlowLowPriorityRemoveModal').on('show.bs.modal', function (event) {
@@ -562,6 +579,13 @@ $('#FlowLowPriorityRemoveModal').on('show.bs.modal', function (event) {
   var endpoint = "/api/flow/" + node_id + "/0/delete/low";
   var modal = $(this);
   modal.find("#FlowLowPriorityRemoveForm").attr("action", endpoint);
+
+  modal.find("#FlowLowPriorityRemoveForm").submit(function(event) {
+    event.preventDefault();
+    var form = $(this);
+    var data = {};
+    submitFormData(endpoint, data);
+  });
 });
 
 
@@ -588,6 +612,46 @@ $('#FlowAddModal').on('show.bs.modal', function (event) {
     output.appendChild(el);
   }
 
+  var controller = document.createElement("option");
+  controller.textContent = "CONTROLLER";
+  controller.value = "CONTROLLER";
+  output.appendChild(controller);
+
   modal.find("#FlowAddForm").attr("action", endpoint);
   modal.find("#node_id").attr("value", node_id);
+
+  modal.find("#FlowAddForm").submit(function(event) {
+    event.preventDefault();
+    var form = $(this);
+    var data = {
+      'name': form.find("#name").val(),
+      'priority': form.find("#priority").val(),
+      'eth_type': form.find("#eth_type").val(),
+      'eth_source': form.find("#eth_source").val(),
+      'eth_destination': form.find("#eth_destination").val(),
+      'ipv4_source': form.find("#ipv4_source").val(),
+      'ipv4_destination': form.find("#ipv4_destination").val(),
+      'output': form.find("#output").val()
+    };
+    submitFormData(endpoint, data);
+  });
 });
+
+var submitFormData = function(endpoint, data) {
+  $.ajax({
+    type: "POST",
+    url: endpoint,
+    headers: {
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
+    data: data,
+    success: function (data) {
+      window.location.href = "/";
+    }
+  });
+}

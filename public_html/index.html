@@ -477,7 +477,7 @@
           <div class="modal-footer">
             <form id="PathFlowsInstallForm" action="" method="POST">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+              <input id="PathFlowsConfirmationSubmit" type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
               <input id="type" type="hidden" value="">
             </form>
           </div>
@@ -509,7 +509,7 @@
 
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+              <input id="FlowRemoveSubmit" type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
             </form>
           </div>
         </div>
@@ -529,7 +529,7 @@
           <div class="modal-footer">
             <form id="FlowLowPriorityRemoveForm" action="" method="POST">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <input type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
+              <input id="FlowLowPriorityRemoveSubmit" type="submit" class="btn btn-danger" value="Yes, I would like to confirm">
             </form>
           </div>
         </div>
@@ -612,14 +612,14 @@ information: <br><br>
             <div class="col-sm-8">
             <select id="output" name="output" class="form-control">
             </select>
-            <small><i>For now, only output to a interface is allowed.</i></small>
+            <!-- <small><i>For now, only output to a interface is allowed.</i></small> -->
             </div>
           </div>
       </div>
 
       <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <input type="submit" class="btn btn-danger" value="Yes, I would like to add this flow">
+          <input id="FlowAddSubmit" type="submit" class="btn btn-danger" value="Yes, I would like to add this flow">
         </form>
       </div>
 

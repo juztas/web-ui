@@ -44,7 +44,6 @@ var D3Force = function(nodes, links, div) {
   this.host_labels_type = "ip";
 
   var fix_layout = true;
-  var lock_highlight = false;
 
   var pathgen = d3.svg.line().interpolate("basis");
 

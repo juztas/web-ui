@@ -1,4 +1,5 @@
 var toggle_task_timer = false;
+var lock_highlight = false;
 var task_management_timer = {};
 
 function getParameterByName(name) {
@@ -46,6 +47,7 @@ function getTemplateAjax(path, callback) {
 }
 
 function display_paths(source, destination, paths) {
+  lock_highlight = true;
   $("nav").show();
   clear_pannel_info();
 
@@ -69,6 +71,7 @@ function display_paths(source, destination, paths) {
 }
 
 function alto_path_manager(paths) {
+  lock_highlight = true;
   $("nav").show();
   clear_pannel_info();
 
@@ -114,6 +117,7 @@ function alto_path_manager(paths) {
 }
 
 function alto_task_manager(tasks) {
+  lock_highlight = true;
   $("nav").show();
   clear_pannel_info();
   // TODO: dispay tasks stat
