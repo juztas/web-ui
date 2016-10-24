@@ -7,7 +7,7 @@
 .host-link {
   fill: none;
 /*  stroke: #999; */
-  stroke-width: 4px;
+  stroke-width: 1.5px;
 }
 
 .port-link {
@@ -21,15 +21,18 @@
 }
 
 .ten-ge-link {
-  stroke: #996633
+  stroke: #996633;
+  stroke-width: 1.5px;
 }
 
 .forty-ge-link {
-  stroke: #9999FF
+  stroke: #9999FF;
+  stroke-width: 2.5px;
 }
 
 .hundred-ge-link {
-  stroke: #CC6666
+  stroke: #CC6666;
+  stroke-width: 3.5px;
 }
 
 .transparent-link {
