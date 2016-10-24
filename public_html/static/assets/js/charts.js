@@ -43,7 +43,7 @@ var D3Force = function(nodes, links, div) {
   this.switch_labels_type = "ip_address";
   this.host_labels_type = "ip";
 
-  var fix_layout = true;
+  this.fix_layout = true;
 
   var pathgen = d3.svg.line().interpolate("basis");
 

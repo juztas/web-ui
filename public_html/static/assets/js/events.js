@@ -22,6 +22,7 @@ d3.select('#load-layout').on('click', function() {
 d3.select('#toggle-fixed-layout').on('click', function() {
   chart.toggle_fixed_layout();
   if (chart.fix_layout) {
+    d3.select('#toggle-fixed-layout i').attr('class', 'fa fa-toggle-on');
   } else {
     d3.select('#toggle-fixed-layout i').attr('class', 'fa fa-toggle-off');
   }
