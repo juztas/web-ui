@@ -49,12 +49,12 @@ var D3Force = function(nodes, links, div) {
 
   this.fadein_all = function() {
     d3.selectAll(".node").style("opacity", "0.3");
-    d3.selectAll(".link-link").style("opacity", "0.3");
+    d3.selectAll(".link-link, .host-link").style("opacity", "0.3");
   };
 
   this.fadeout_all = function() {
     d3.selectAll(".node").style("opacity", "1");
-    d3.selectAll(".link-link").style("opacity", "1").style("cursor", null);
+    d3.selectAll(".link-link, .host-link").style("opacity", "1").style("cursor", null);
     $("nav").hide();
     toggle_task_timer = false;
     clearTimeout(task_management_timer);
