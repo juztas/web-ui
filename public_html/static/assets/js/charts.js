@@ -268,12 +268,13 @@ var D3Force = function(nodes, links, div) {
 
   this.save_layout = function() {
     show_msg("Saving current layout to server...", "alert-info", 3000);
-    positions = {};
     d3.selectAll(".node").each(function(d) {
-      positions[d.id] = [d.x, d.y];
+      if (!_this.positions_cache[d.id]) {
+        _this.positions_cache[d.id] = [];
+      }
+      _this.positions_cache[d.id][0] = d.x;
+      _this.positions_cache[d.id][1] = d.y;
     });
-
-    _this.positions_cache = positions;
 
     // Remote Store
     $.ajax({
@@ -288,7 +289,7 @@ var D3Force = function(nodes, links, div) {
           window.location.href = "/login.html";
         }
       },
-      data: JSON.stringify(positions),
+      data: JSON.stringify(_this.positions_cache),
       success: function(data) {
         console.log("Saved layout");
       },
