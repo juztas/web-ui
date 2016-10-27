@@ -6,7 +6,55 @@ $("#menu-toggle").click(function(e) {
 
 $("#zoom-mode").click(function(e) {
   $('#zoom-mode').toggleClass('active');
+  chart.zoom = !chart.zoom;
 });
+
+$("#show-single-flow").click(function(e) {
+  plot_mode = SINGLE_FLOW;
+  clearInterval(plot_flow_interval);
+  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+});
+
+$("#show-round-trip").click(function(e) {
+  plot_mode = ROUND_TRIP;
+  clearInterval(plot_flow_interval);
+  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+});
+
+$("#show-path").click(function(e) {
+  plot_mode = EXPLORE_PATH;
+  clearInterval(plot_flow_interval);
+  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+});
+
+$("#show-round-trip-path").click(function(e) {
+  plot_mode = EXPLORE_ROUND_TRIP_PATH;
+  clearInterval(plot_flow_interval);
+  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+});
+
+$("#show-all-flow").click(function(e) {
+  plot_mode = ALL_FLOW;
+  clearInterval(plot_flow_interval);
+  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+});
+
+var TIME_SCALE_MAP = {
+  'last-15min': 60*15,
+  'last-2hour': 60*60*2,
+  'last-12hour': 60*60*12,
+  'last-1day': 60*60*24,
+  'last-3day': 60*60*24*3,
+  'last-1week': 60*60*24*7,
+  'last-1month': 60*60*24*30,
+  'last-3month': 60*15*24*92,
+  'last-1year': 60*15*24*365,
+};
+
+$("[id^=last-]").click(function(e) {
+  var scale = $(this).attr('id');
+  time_scale = TIME_SCALE_MAP[scale];
+})
 
 /* Save positions */
 d3.select('#save-layout').on('click', function() {

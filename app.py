@@ -46,14 +46,12 @@ def get_ports_on_path(path):
     ports = filter(lambda x: re.match(regex, x), path)
     return zip(ports[::2], ports[1::2])
 
-def get_rrd_stats(node_id, table_id, clean_flow_id):
+def get_rrd_stats(node_id, table_id, clean_flow_id, diff=60 * 15):
     filename = str("%s/%s/%s/%s.rrd" % (rrd_dir,
                                         node_id,
                                         table_id,
                                         clean_flow_id))
 
-    diff = 60 * 120 # 30 min
-    #diff2 = 60 * 15
     end = int(time.time())
     begin = end - diff
 
@@ -74,6 +72,78 @@ def get_rrd_stats(node_id, table_id, clean_flow_id):
                          'packets': 0 if value[1] is None else value[1]})
             ts += step
     return data
+
+def check_match_flow(flow, eth_type, eth_src, eth_dest, ipv4_src, ipv4_dest):
+    return (flow.get_ethernet_type() == eth_type and
+            flow.get_ethernet_source() == eth_src and
+            flow.get_ethernet_destination() == eth_dest and
+            flow.get_ipv4_source() == ipv4_src and
+            flow.get_ipv4_destination() == ipv4_dest)
+
+def check_reverse_match_flow(flow, eth_type, eth_src, eth_dest, ipv4_src, ipv4_dest):
+    return (flow.get_ethernet_type() == eth_type and
+            flow.get_ethernet_source() == eth_dest and
+            flow.get_ethernet_destination() == eth_src and
+            flow.get_ipv4_source() == ipv4_dest and
+            flow.get_ipv4_destination() == ipv4_src)
+
+def explore_path(nodes, main_flow, eth_type, eth_src, eth_dest, ipv4_src, ipv4_dest):
+    path = []
+    main_table = main_flow.table
+    main_node = main_table.node
+    main_data = {
+        'id': main_node.id,
+        'main': {
+            'table_id': main_table.id,
+            'clean_flow_id': main_flow.clean_id
+        }
+    }
+    oposite_flow = {}
+    for t in main_node.get_tables().values():
+        for f in t.get_all_flows().values():
+            if (check_reverse_match_flow(f, eth_type, eth_src, eth_dest,
+                                         ipv4_src, ipv4_dest) and
+                ((not oposite_flow) or f.priority > oposite_flow.priority)):
+                oposite_flow = f
+    if oposite_flow:
+        main_data['oposite'] = {
+            'table_id': oposite_flow.table.id,
+            'clean_flow_id': oposite_flow.clean_id
+        }
+    path.append(main_data)
+
+    for n in nodes.values():
+        ndata = {}
+        if n.id == main_node.id:
+            continue
+        main_flow = {}
+        oposite_flow = {}
+        for t in n.get_tables().values():
+            for f in t.get_all_flows().values():
+                if (check_match_flow(f, eth_type, eth_src, eth_dest,
+                                             ipv4_src, ipv4_dest) and
+                    ((not main_flow) or f.priority > main_flow.priority)):
+                    main_flow = f
+                if (check_reverse_match_flow(f, eth_type, eth_src, eth_dest,
+                                             ipv4_src, ipv4_dest) and
+                    ((not oposite_flow) or f.priority > oposite_flow.priority)):
+                    oposite_flow = f
+        if main_flow:
+            ndata = {
+                'id': n.id,
+                'main': {
+                    'table_id': main_flow.table.id,
+                    'clean_flow_id': main_flow.clean_id
+                }
+            }
+            if oposite_flow:
+                ndata['oposite'] = {
+                    'table_id': oposite_flow.table.id,
+                    'clean_flow_id': oposite_flow.clean_id
+                }
+            path.append(ndata)
+
+    return path
 
 @app.route('/verify', methods=['GET'])
 @requires_auth
@@ -139,16 +209,17 @@ def install_flow(node_id, table_id):
                        template_dir = template_dir)
     return flask.redirect("/")
 
-@app.route('/stats/flow/<node_id>/<table_id>/<clean_flow_id>', methods=['GET'])
+@app.route('/stats/flow/<node_id>/<table_id>/<clean_flow_id>', defaults={'diff': 60*15}, methods=['GET'])
+@app.route('/stats/flow/<node_id>/<table_id>/<clean_flow_id>/<int:diff>', methods=['GET'])
 @requires_auth
-def flow_stats(node_id, table_id, clean_flow_id):
+def flow_stats(node_id, table_id, clean_flow_id, diff):
     """
     This endpoint returns statistics to plot.
     You should pass a node id, table id and a clean flow id. (removing #, $, -
     and * symbols from id).
     """
     # Main flow
-    main = get_rrd_stats(node_id, table_id, clean_flow_id)
+    main = get_rrd_stats(node_id, table_id, clean_flow_id, diff)
 
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
@@ -166,12 +237,67 @@ def flow_stats(node_id, table_id, clean_flow_id):
         if oposite.clean_id != clean_flow_id:
             break
     if flows:
-        oposite = get_rrd_stats(node_id, table_id, oposite.clean_id)
+        oposite = get_rrd_stats(node_id, table_id, oposite.clean_id, diff)
     else:
         oposite = []
 
     return flask.jsonify({'main': main,
                           'oposite': oposite})
+
+@app.route('/stats/path/<node_id>/<table_id>/<clean_flow_id>', defaults={'diff': 60*15}, methods=['GET'])
+@app.route('/stats/path/<node_id>/<table_id>/<clean_flow_id>/<int:diff>', methods=['GET'])
+@requires_auth
+def path_stats(node_id, table_id, clean_flow_id, diff):
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    try:
+        node = odl.get_node_by_id(node_id)
+        table = node.get_table_by_id(table_id)
+        flow = table.get_flow_by_clean_id(clean_flow_id)
+    except (NodeNotFound, TableNotFound, FlowNotFound) as e:
+        return flask.abort(404)
+
+    nodes = odl.get_nodes()
+    data = [];
+    eth_type = flow.get_ethernet_type()
+    eth_src = flow.get_ethernet_source()
+    eth_dest = flow.get_ethernet_destination()
+    ipv4_src = flow.get_ipv4_source()
+    ipv4_dest = flow.get_ipv4_destination()
+    if eth_type == 0x0800 and (eth_src != '*' or
+                               eth_dest != '*' or
+                               ipv4_src != '*' or
+                               ipv4_dest != '*'):
+        path = explore_path(nodes, flow, eth_type, eth_src, eth_dest, ipv4_src, ipv4_dest)
+        for n in path:
+            ndata = {
+                'id': n['id'],
+                'main': get_rrd_stats(n['id'], n['main']['table_id'], n['main']['clean_flow_id'], diff)
+            }
+            if n.has_key('oposite'):
+                ndata['oposite'] = get_rrd_stats(n['id'], n['oposite']['table_id'], n['oposite']['clean_flow_id'], diff)
+            data.append(ndata)
+    else:
+        data.append({'id': node.id, 'main': get_rrd_stats(node.id, table.id, flow.clean_id, diff)})
+    return flask.jsonify(data)
+
+@app.route('/stats/all/flow/<name>/<int:diff>', methods=['GET'])
+@requires_auth
+def flow_stats_all(name, diff):
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    nodes = odl.get_nodes()
+    stats = {}
+    for node in nodes.values():
+        tables = node.get_tables()
+        node_stats = {}
+        for table in tables.values():
+            flows = table.get_config_flows_by_name(name)
+            for flow in flows:
+                node_stats[flow.clean_id] = get_rrd_stats(node.id, table.id, flow.clean_id, diff)
+        if node_stats:
+            stats[node.id] = node_stats
+    return flask.jsonify(stats)
 
 @app.route('/routes/l2', methods=['POST'])
 @requires_auth
