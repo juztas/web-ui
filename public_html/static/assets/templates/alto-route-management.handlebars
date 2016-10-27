@@ -9,12 +9,13 @@
                 <th>Length</th>
                 <th>Route</th>
                 <th colspan="2">Rate Limit (kbps)</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {{#each paths}}
               <tr>
-                <td><a href="#" data-toggle="modal" data-target="#ALTORouteRemoveModal" data-route="{{this.path}}"><i style="color: #d35400;" title="Click here to remove this path..." class="fa fa-trash"></i></a></td>
+                <td><a href="#" data-toggle="modal" data-target="#ALTORouteRemoveModal" data-route="{{this.path}}" data-id="{{this.id}}"><i style="color: #d35400;" title="Click here to remove this path..." class="fa fa-trash"></i></a></td>
                 <td>{{this.path.length}}</td>
                 <td>{{#each this.path}}<span class="label label-primary">{{this}}</span> {{/each}}</td>
                 <td style="color: #d35400">
@@ -31,6 +32,13 @@
                 <td>
                   <button type="button" class="btn btn-success btn-xs tc-create"><i class="fa fa-pencil"></i>Create</button>
                   {{/tc}}
+                </td>
+                <td>
+                  {{#id}}
+                  <a target="_blank" href="/plot_flow_new.html?path_id={{this}}"><i class="fa fa-area-chart"></i></a>
+                  {{/id}}
+                  {{^id}}
+                  {{/id}}
                 </td>
               </tr>
               {{/each}}

@@ -23,6 +23,8 @@ app.debug = True
 
 session_l2paths = {}
 session_l3paths = {}
+cache_l2paths = {}
+cache_l3paths = {}
 
 def check_auth(username, password):
     return username == ui_user and password == ui_pass
@@ -299,6 +301,47 @@ def flow_stats_all(name, diff):
             stats[node.id] = node_stats
     return flask.jsonify(stats)
 
+@app.route('/stats/e2e/<path_id>', defaults={'diff': 60*15}, methods=['GET'])
+@app.route('/stats/e2e/<path_id>/<int:diff>', methods=['GET'])
+@requires_auth
+def e2e_stats(path_id, diff):
+    if cache_l2paths.has_key(path_id):
+        path = cache_l2paths[path_id]
+        flow_name = "L2AR%s" % path_id.split("-")[0]
+        source_host = ":".join(path[0].split(":")[1::])
+        target_host = ":".join(path[-1].split(":")[1::])
+        match = {'eth_type': 0x0800, 'eth_src': source_host, 'eth_dest': target_host, 'ipv4_src': '*', 'ipv4_dest': '*'}
+    elif cache_l3paths.has_key(path_id):
+        path = cache_l3paths[path_id]
+        flow_name = "L3AR%s" % path_id.split("-")[0]
+        source_host = path[0]
+        target_host = path[-1]
+        match = {'eth_type': 0x0800, 'eth_src': '*', 'eth_dest': '*', 'ipv4_src': source_host, 'ipv4_dest': target_host}
+    else:
+        flask.abort(404)
+    ports = get_ports_on_path(path)
+    target_switch = "%s:%s" % (ports[0][1].split(":")[0], ports[0][1].split(":")[1])
+    try:
+        credentials = (odl_user, odl_pass)
+        odl = ODLInstance(odl_server, credentials)
+        node = odl.get_node_by_id(target_switch)
+        table = node.get_table_by_id(0) # Assuming installing on table 0
+        source_host
+    except (NodeNotFound, TableNotFound) as e:
+        print "Error: 404 - Switch or table not found in database"
+        flask.abort(404)
+
+    stats = {}
+    node_stats = {}
+    for flow in table.get_config_flows_by_name(flow_name):
+        if check_match_flow(flow, **match):
+            node_stats[flow.clean_id] = get_rrd_stats(node.id, table.id, flow.clean_id, diff)
+            break
+    if node_stats:
+        stats[node.id] = node_stats
+    return flask.jsonify(stats)
+
+
 @app.route('/routes/l2', methods=['POST'])
 @requires_auth
 def l2routes():
@@ -392,6 +435,17 @@ def l3routes():
     return flask.jsonify({'paths': paths})
 
 
+@app.route('/route/list', methods=['GET'])
+@requires_auth
+def routelist():
+    paths = []
+    for path_id in cache_l2paths.keys():
+        paths.append({'id': path_id, 'path': cache_l2paths[path_id]})
+    for path_id in cache_l3paths.keys():
+        paths.append({'id': path_id, 'path': cache_l3paths[path_id]})
+
+    return flask.jsonify({'paths': paths})
+
 @app.route('/flow/path/l2/<path_id>', methods=['POST'])
 @requires_auth
 def install_flows_for_l2path(path_id):
@@ -454,6 +508,7 @@ def install_flows_for_l2path(path_id):
                        destination = source_host,
                        template_dir = template_dir)
 
+    cache_l2paths[path_id] = path
     # Update Json file
     return flask.redirect("/")
 
@@ -516,6 +571,7 @@ def install_flows_for_l3path(path_id):
                        destination = "%s/32" % source_host,
                        template_dir = template_dir)
 
+    cache_l3paths[path_id] = path
     # Update Json file
     return flask.redirect("/")
 

@@ -251,6 +251,26 @@ $('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', fu
 
 });
 
+$("#L2L3RouteManagement").click(function (event) {
+  $.ajax({
+    type: "GET",
+    contentType: "application/json; charset=utf-8",
+    url: "api/route/list",
+    headers: {
+      "Authorization": "Basic " + (Cookies.get('auth') || "")
+    },
+    statusCode: {
+      401: function() {
+        window.location.href = "/login.html";
+      }
+    },
+    success: function (data) {
+      alto_path_manager(data['paths']);
+    },
+    dataType: "json"
+  });
+});
+
 $("#ALTOTaskSubmissionModal").on('show.bs.modal', function (event) {
   var modal = $(this);
   var source = modal.find("#l3source")[0];
