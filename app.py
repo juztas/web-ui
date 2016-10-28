@@ -467,8 +467,11 @@ def install_flows_for_l2path(path_id):
     # [(u'openflow:562958149829575:2', u'openflow:562958149829575:21'),
     #  (u'openflow:440565346114459:257', u'openflow:440565346114459:217')]
 
-    source_host = ":".join(path[0].split(":")[1::])
-    target_host = ":".join(path[-1].split(":")[1::])
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    source_host = data['source']
+    target_host = data['destination']
+    # source_host = ":".join(path[0].split(":")[1::])
+    # target_host = ":".join(path[-1].split(":")[1::])
 
     # Install a flow in each switch on the path with correct output
     # port.

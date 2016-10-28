@@ -12,6 +12,7 @@
     <!-- CSS -->
     <link type="text/css" href="/static/assets/css/font-awesome.min.css" rel="stylesheet">
     <link type="text/css" href="/static/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <link type="text/css" href="/static/assets/css/simple-sidebar.css" rel="stylesheet">
 
     <link type="text/css" href="/static/assets/css/main.css" rel="stylesheet">
@@ -30,6 +31,7 @@
     <script src="/static/assets/js/jquery-1.11.3.min.js"></script>
     <script src="/static/assets/js/d3.min.js"></script>
     <script src="/static/assets/js/bootstrap.min.js"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <script src="/static/assets/js/handlebars.min-latest.js"></script>
     <script src="/static/assets/js/js.cookie.js"></script>
 
@@ -156,11 +158,37 @@
           <div class="modal-body" id="modal-msg">
             <form id ="routeCalculationForm" action="#" method="POST" class="form-horizontal">
               <div class="form-group">
+                <div class="col-sm-8">
+                  <label for="enable-l2source-gateway" class="checkbox-inline">
+                    <input id="enable-l2source-gateway" name="enable-l2source-gateway" type="checkbox" data-toggle="toggle">
+                    Try to find the path FROM a GATEWAY port?
+                  </label>
+                </div>
+                <div class="col-sm-4">
+                  <select id="source-gateway" name="source-gateway" disabled class="form-control">
+                    <option>Choose a gateway</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
                 <label for="source" class="col-sm-2 control-label">Source:</label>
                 <div class="col-sm-10">
                 <select id="l2source" name="source" class="form-control">
                   <option>Choose a source host</option>
                 </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-8">
+                  <label for="enable-l2destination-gateway" class="checkbox-inline">
+                    <input id="enable-l2destination-gateway" name="enable-l2destination-gateway" type="checkbox" data-toggle="toggle">
+                    Try to find the path TO a GATEWAY port?
+                  </label>
+                </div>
+                <div class="col-sm-4">
+                  <select id="destination-gateway" name="destination-gateway" disabled class="form-control">
+                    <option>Choose a gateway</option>
+                  </select>
                 </div>
               </div>
               <div class="form-group">
@@ -473,7 +501,34 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="generic-modal-title">Are you sure about that?</h4>
           </div>
-          <div class="modal-body" id="modal-msg">Do you wanna install flows on this path ?
+          <div class="modal-body" id="modal-msg">
+            Do you wanna install flows on this path ?
+            <form id="pathMatchForm" action="#" method="POST" class="form-horizontal">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <strong>The match information is not complete. You need to specify IP/MAC addresses:</strong>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="source" class="col-sm-2 control-label">Source:</label>
+                <div class="col-sm-10">
+                  <input id="l2l3source" name="source" class="form-control" placeholder="Specify the ip/mac address for source">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="destination" class="col-sm-2 control-label">Destination:</label>
+                <div class="col-sm-10">
+                  <input id="l2l3destination" name="destination" class="form-control" placeholder="Specify the ip/mac address for destination">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-10">
+                  <label class="checkbox-inline">
+                    <input type="checkbox" id="default-match">I don't know. Specify as ANY.
+                  </label>
+                </div>
+            </form>
           </div>
           <div class="modal-footer">
             <form id="PathFlowsInstallForm" action="" method="POST">

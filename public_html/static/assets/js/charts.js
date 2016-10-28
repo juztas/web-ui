@@ -483,6 +483,35 @@ var D3Force = function(nodes, links, div) {
     return hosts;
   };
 
+  this.get_all_switches = function() {
+    var switches = [];
+    for (var key in _this.nodes) {
+      var node = _this.nodes[key];
+      if (node.type == "switch" || node.type == "ovs") {
+        if (_this.positions_cache &&
+            _this.positions_cache[key] &&
+            _this.positions_cache[key][2]) {
+          node.customize = _this.positions_cache[d.id][2];
+        } else {
+          node.customize = "NoName" + node.index;
+        }
+        switches.push(node);
+      }
+    }
+    return switches;
+  };
+
+  this.get_all_ports_in_switch = function(id) {
+    var node = _this.nodes[id];
+    var ports = [];
+    for (var key in node.connectors) {
+      if (key.split(':')[2] != 'LOCAL') {
+        ports.push(node.connectors[key]);
+      }
+    }
+    return ports;
+  };
+
   // Switch nodes filter
   var filteredNodes = [];
   d3.values(this.nodes).forEach(function(node) {

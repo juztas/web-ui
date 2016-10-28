@@ -32,7 +32,7 @@
                   <tbody>
                     {{#each paths}}
                     <tr>
-                      <td><a href="#" data-toggle="modal" data-target="#PathFlowsConfirmationModal" data-path="{{this.uid}}"><i style="color: orange;" title="Click here to activate this path, installing flows..." class="fa fa-bolt"></i></a></td>
+                      <td><a href="#" data-toggle="modal" data-target="#PathFlowsConfirmationModal" data-path="{{this.uid}}" data-pathlist="{{this.path}}"><i style="color: orange;" title="Click here to activate this path, installing flows..." class="fa fa-bolt"></i></a></td>
                       <td>{{this.path.length}}</td>
                       <td>{{#each this.path}}<span class="label label-primary">{{this}}</span> {{/each}}</td>
                     </tr>

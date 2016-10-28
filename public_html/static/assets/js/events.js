@@ -165,6 +165,11 @@ $('#L2RouteCalculationModal').on('show.bs.modal', function (event) {
     destination.appendChild(el);
   }
 
+  modal.find("#source-gateway").prop('disabled', true);
+  modal.find("#enable-l2source-gateway").bootstrapToggle('off');
+  modal.find("#destination-gateway").prop('disabled', true);
+  modal.find("#enable-l2destination-gateway").bootstrapToggle('off');
+
 });
 
 $("#L2RouteCalculationFormSubmit").click(function(e) {
@@ -197,6 +202,108 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
     dataType: "json"
   });
 
+});
+
+$('#enable-l2source-gateway').change(function() {
+  if ($(this).prop('checked')) {
+    var source_gateway = $('#source-gateway');
+    source_gateway.prop('disabled', false);
+    var switches = chart.get_all_switches();
+
+    source_gateway.html('');
+
+    switches.forEach(function(sw) {
+      var opt = sw.id + ' - ' + sw.customize;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = sw.id;
+      source_gateway.append(el);
+    });
+  } else {
+    $('#source-gateway').prop('disabled', true);
+    var modal = $("#L2RouteCalculationModal");
+    var source = modal.find("#l2source")[0];
+    var destination = modal.find("#l2destination")[0];
+    var hosts = chart.get_all_hosts();
+
+    while (source.children.length > 0) {
+      source.children[0].remove();
+    }
+
+    while (destination.children.length >0) {
+      destination.children[0].remove();
+    }
+
+    for(var i = 0; i < hosts.length; i++) {
+      var opt = hosts[i]['node-id'];
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = opt;
+      source.appendChild(el);
+    }
+
+    for(var i = 0; i < hosts.length; i++) {
+      var opt = hosts[i]['node-id'];
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = opt;
+      destination.appendChild(el);
+    }
+  }
+});
+
+$('#source-gateway').change(function() {
+  if (!$(this).prop('disabled')) {
+    var ports = chart.get_all_ports_in_switch($(this).val());
+    var source = $('#l2source');
+
+    source.html('');
+
+    ports.forEach(function(port) {
+      var opt = port.id + ' - ' + port.name;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = port.id;
+      source.append(el);
+    });
+  }
+});
+
+$('#enable-l2destination-gateway').change(function() {
+  if ($(this).prop('checked')) {
+    var destination_gateway = $('#destination-gateway');
+    destination_gateway.prop('disabled', false);
+    var switches = chart.get_all_switches();
+
+    destination_gateway.html('');
+
+    switches.forEach(function(sw) {
+      var opt = sw.id + ' - ' + sw.customize;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = sw.id;
+      destination_gateway.append(el);
+    });
+  } else {
+    $('#destination-gateway').prop('disabled', true);
+  }
+});
+
+$('#destination-gateway').change(function() {
+  if (!$(this).prop('disabled')) {
+    var ports = chart.get_all_ports_in_switch($(this).val());
+    var destination = $('#l2destination');
+
+    destination.html('');
+
+    ports.forEach(function(port) {
+      var opt = port.id + ' - ' + port.name;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = port.id;
+      destination.append(el);
+    });
+  }
 });
 
 $('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', function (event) {
@@ -606,6 +713,28 @@ $("#ALTORemoveRateFormSubmit").click(function (e) {
 $('#PathFlowsConfirmationModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget);
   var path_id = button.data('path');
+  var path = button.data('pathlist').split(',');
+  var source = path[0];
+  var destination = path[path.length-1];
+  if (!source.startsWith("openflow:")) {
+    $("#l2l3source").prop('disabled', true);
+    if (source.startsWith("host:")) {
+      $("#l2l3source").val(source.slice(5));
+    } else {
+      $("#l2l3source").val(source);
+    }
+  }
+  if (!destination.startsWith("openflow:")) {
+    $("#l2l3destination").prop('disabled', true);
+    if (destination.startsWith("host:")) {
+      $("#l2l3destination").val(destination.slice(5));
+    } else {
+      $("#l2l3destination").val(destination);
+    }
+  }
+  if (source.startsWith("openflow:") || destination.startsWith("openflow:")) {
+    $("#pathMatchForm").hide();
+  }
 
   var modal = $(this);
   var type = modal.find("#type")[0].value;
@@ -615,7 +744,10 @@ $('#PathFlowsConfirmationModal').on('show.bs.modal', function (event) {
   modal.find("#PathFlowsInstallForm").submit(function(event) {
     event.preventDefault();
     var form = $(this);
-    var data = {};
+    var data = {
+      source: $("#l2l3source").val(),
+      destination: $("#l2l3destination").val()
+    };
     submitFormData(endpoint, data);
   });
 });
