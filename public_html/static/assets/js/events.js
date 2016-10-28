@@ -12,30 +12,35 @@ $("#zoom-mode").click(function(e) {
 $("#show-single-flow").click(function(e) {
   plot_mode = SINGLE_FLOW;
   clearInterval(plot_flow_interval);
+  plot_flow_traffic();
   setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-round-trip").click(function(e) {
   plot_mode = ROUND_TRIP;
   clearInterval(plot_flow_interval);
+  plot_flow_traffic();
   setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-path").click(function(e) {
   plot_mode = EXPLORE_PATH;
   clearInterval(plot_flow_interval);
+  plot_flow_traffic();
   setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-round-trip-path").click(function(e) {
   plot_mode = EXPLORE_ROUND_TRIP_PATH;
   clearInterval(plot_flow_interval);
+  plot_flow_traffic();
   setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-all-flow").click(function(e) {
   plot_mode = ALL_FLOW;
   clearInterval(plot_flow_interval);
+  plot_flow_traffic();
   setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
