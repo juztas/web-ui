@@ -578,26 +578,39 @@
            console.log(json);
 
            data = [];
-           all_bytes = [];
-           Object.keys(json).forEach(function(node_id) {
-             flows = json[node_id];
-             Object.keys(flows).forEach(function(flow_id) {
-               bytes_line = flows[flow_id].map(function(f) {
-                 return f.bytes;
-               });
-               all_bytes = all_bytes.concat(bytes_line);
-               time_line = flows[flow_id].map(function(f) {
-                 return d3.time.format("%Y-%m-%d %H:%M:%S").parse(f.date);
-               });
-               data.push(
-                 create_scatter_line(time_line, bytes_line,
-                                     node_id + ' - ' + flow_id, node_id)
-               );
+           var main_time_line = [];
+           var main_bytes_line = [];
+           var oposite_time_line = [];
+           var oposite_bytes_line = [];
 
-             });
+           main_time_line = json.main.map(function(d) {
+             return d3.time.format("%Y-%m-%d %H:%M:%S").parse(d.date);
            });
+           main_bytes_line = json.main.map(function(d) {
+             return d.bytes;
+           });
+           var label = json.source + ' -> ' + json.target;
 
-           level = Math.log2(d3.max(all_bytes));
+           if (flip) {
+             label = json.target + ' -> ' + json.source;
+             if (json.oposite) {
+               main_time_line = json.oposite.map(function(d) {
+                 return d3.time.format("%Y-%m-%d %H:%M:%S").parse(d.date);
+               });
+               main_bytes_line = json.oposite.map(function(d) {
+                 return d.bytes;
+               });
+             } else {
+               main_bytes_line = main_bytes_line.map(function(d) {
+                 return 0;
+               });
+               show_msg("There is no oposite path between these two endpoints", "alert-warning", 3000);
+             }
+           }
+
+           all_bytes_line = main_bytes_line.concat(oposite_bytes_line);
+
+           level = Math.log2(d3.max(all_bytes_line));
            if (level > 27) {
              ratio = 1024 * 1024 * 1024;
              unit = "Gbps";
@@ -612,26 +625,26 @@
              unit = "bps";
            }
 
-           all_bytes = all_bytes.map(function(d) {
+           main_bytes_line = main_bytes_line.map(function(d) {
+             return 8 * d / ratio;
+           });
+           oposite_bytes_line = oposite_bytes_line.map(function(d) {
              return 8 * d / ratio;
            });
 
-           var maximum = d3.max(all_bytes) || 0;
-           var average = d3.mean(all_bytes) || 0;
-           var minimum = d3.min(all_bytes) || 0;
+           var maximum = d3.max(main_bytes_line) || 0;
+           var average = d3.mean(main_bytes_line) || 0;
+           var minimum = d3.min(main_bytes_line) || 0;
 
            $("#max").html(maximum.toFixed(2));
            $("#avg").html(average.toFixed(2));
            $("#min").html(minimum.toFixed(2));
            $(".unit").html(unit);
 
-           data.forEach(function(d) {
-             d.y = d.y.map(function(y) {
-               return 8 * y / ratio;
-             });
-           });
-
-           plotDiv.data = data;
+           plotDiv.data = [
+             create_scatter_line(main_time_line, main_bytes_line,
+                                 label)
+           ];
            clear_plot_div();
            Plotly.relayout(plotDiv, layout(unit));
            Plotly.redraw(plotDiv);

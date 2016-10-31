@@ -314,32 +314,40 @@ def e2e_stats(path_id, diff):
     elif cache_l3paths.has_key(path_id):
         path = cache_l3paths[path_id]
         flow_name = "L3AR%s" % path_id.split("-")[0]
-        source_host = path[0]
-        target_host = path[-1]
+        source_host = path[0] + '/32'
+        target_host = path[-1] + '/32'
         match = {'eth_type': 0x0800, 'eth_src': '*', 'eth_dest': '*', 'ipv4_src': source_host, 'ipv4_dest': target_host}
     else:
         flask.abort(404)
     ports = get_ports_on_path(path)
-    target_switch = "%s:%s" % (ports[0][1].split(":")[0], ports[0][1].split(":")[1])
+    source_switch = "%s:%s" % (ports[0][1].split(":")[0], ports[0][1].split(":")[1])
+    target_switch = "%s:%s" % (ports[-1][0].split(":")[0], ports[-1][0].split(":")[1])
     try:
         credentials = (odl_user, odl_pass)
         odl = ODLInstance(odl_server, credentials)
-        node = odl.get_node_by_id(target_switch)
-        table = node.get_table_by_id(0) # Assuming installing on table 0
-        source_host
+        main_node = odl.get_node_by_id(source_switch)
+        oposite_node = odl.get_node_by_id(target_switch)
+        # Assuming installing on table 0
+        main_table = main_node.get_table_by_id(0)
+        oposite_table = oposite_node.get_table_by_id(0)
     except (NodeNotFound, TableNotFound) as e:
         print "Error: 404 - Switch or table not found in database"
         flask.abort(404)
 
-    stats = {}
-    node_stats = {}
-    for flow in table.get_config_flows_by_name(flow_name):
+    main = {}
+    for flow in main_table.get_config_flows_by_name(flow_name):
         if check_match_flow(flow, **match):
-            node_stats[flow.clean_id] = get_rrd_stats(node.id, table.id, flow.clean_id, diff)
+            main = get_rrd_stats(main_node.id, main_table.id, flow.clean_id, diff)
             break
-    if node_stats:
-        stats[node.id] = node_stats
-    return flask.jsonify(stats)
+    oposite = {}
+    for flow in oposite_table.get_config_flows_by_name(flow_name):
+        if check_reverse_match_flow(flow, **match):
+            oposite = get_rrd_stats(oposite_node.id, oposite_table.id, flow.clean_id, diff)
+            break
+    return flask.jsonify({'main': main,
+                          'oposite': oposite,
+                          'source': source_host,
+                          'target': target_host})
 
 
 @app.route('/routes/l2', methods=['POST'])
