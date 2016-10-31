@@ -120,6 +120,7 @@
      var ALL_FLOW = 4;
      var plot_mode = SINGLE_FLOW;
      var time_scale = 60*15;
+     var flip = false;
 
      /* var margin = {t: 100, r: 20, b: 30, l: 50},
       *     width = $("#plot-flow-d3").parent().width(),
@@ -235,16 +236,32 @@
              });
            }
 
+           if (!round_trip && flip) {
+             if (json.oposite) {
+               main_time_line = json.oposite.map(function(d) {
+                 return d3.time.format("%Y-%m-%d %H:%M:%S").parse(d.date);
+               });
+               main_bytes_line = json.oposite.map(function(d) {
+                 return d.bytes;
+               });
+             } else {
+               main_bytes_line = main_bytes_line.map(function(d) {
+                 return 0;
+               });
+               show_msg("There is no oposite flow in this node", "alert-warning", 3000);
+             }
+           }
+
            all_bytes_line = main_bytes_line.concat(oposite_bytes_line);
 
-           level = Math.log10(d3.max(all_bytes_line));
-           if (level > 9) {
+           level = Math.log2(d3.max(all_bytes_line));
+           if (level > 27) {
              ratio = 1024 * 1024 * 1024;
              unit = "Gbps";
-           } else if (level > 6) {
+           } else if (level > 17) {
              ratio = 1024 * 1024;
              unit = "Mbps";
-           } else if (level > 3) {
+           } else if (level > 7) {
              ratio = 1024;
              unit = "Kbps";
            } else {
@@ -259,9 +276,9 @@
              return 8 * d / ratio;
            });
 
-           var maximum = d3.max(main_bytes_line);
-           var average = d3.mean(main_bytes_line);
-           var minimum = d3.min(main_bytes_line);
+           var maximum = d3.max(main_bytes_line) || 0;
+           var average = d3.mean(main_bytes_line) || 0;
+           var minimum = d3.min(main_bytes_line) || 0;
 
            $("#max").html(maximum.toFixed(2));
            $("#avg").html(average.toFixed(2));
@@ -315,7 +332,6 @@
              main_bytes_line = main_node.main.map(function(d) {
                return d.bytes;
              });
-             all_bytes = all_bytes.concat(main_bytes_line);
 
              if (round_trip && main_node.oposite) {
                oposite_time_line = main_node.oposite.map(function(d) {
@@ -326,6 +342,24 @@
                });
                all_bytes = all_bytes.concat(oposite_bytes_line);
              }
+
+             if (!round_trip && flip) {
+               if (main_node.oposite) {
+                 main_time_line = main_node.oposite.map(function(d) {
+                   return d3.time.format("%Y-%m-%d %H:%M:%S").parse(d.date);
+                 });
+                 main_bytes_line = main_node.oposite.map(function(d) {
+                   return d.bytes;
+                 });
+               } else {
+                 main_bytes_line = main_bytes_line.map(function(d) {
+                   return 0;
+                 });
+                 show_msg("There is no oposite flow in some nodes", "alert-warning", 3000);
+               }
+             }
+
+             all_bytes = all_bytes.concat(main_bytes_line);
            }
 
            var extra_nodes = [];
@@ -337,7 +371,6 @@
              node.main_bytes_line = n.main.map(function(d) {
                return d.bytes;
              });
-             all_bytes = all_bytes.concat(node.main_bytes_line);
 
              if (round_trip && n.oposite) {
                node.oposite_time_line = n.oposite.map(function(d) {
@@ -348,17 +381,35 @@
                });
                all_bytes = all_bytes.concat(node.oposite_bytes_line);
              }
+
+             if (!round_trip && flip) {
+               if (n.oposite) {
+                 node.main_time_line = n.oposite.map(function(d) {
+                   return d3.time.format("%Y-%m-%d %H:%M:%S").parse(d.date);
+                 });
+                 node.main_bytes_line = n.oposite.map(function(d) {
+                   return d.bytes;
+                 });
+               } else {
+                 node.main_bytes_line = main_bytes_line.map(function(d) {
+                   return 0;
+                 });
+                 show_msg("There is no oposite flow in node: " + n.id, "alert-warning", 3000);
+               }
+             }
+
+             all_bytes = all_bytes.concat(node.main_bytes_line);
              extra_nodes.push(node);
            });
 
-           level = Math.log10(d3.max(all_bytes));
-           if (level > 9) {
+           level = Math.log2(d3.max(all_bytes));
+           if (level > 27) {
              ratio = 1024 * 1024 * 1024;
              unit = "Gbps";
-           } else if (level > 6) {
+           } else if (level > 17) {
              ratio = 1024 * 1024;
              unit = "Mbps";
-           } else if (level > 3) {
+           } else if (level > 7) {
              ratio = 1024;
              unit = "Kbps";
            } else {
@@ -370,9 +421,9 @@
              return 8 * d / ratio;
            });
 
-           var maximum = d3.max(all_bytes);
-           var average = d3.mean(all_bytes);
-           var minimum = d3.min(all_bytes);
+           var maximum = d3.max(all_bytes) || 0;
+           var average = d3.mean(all_bytes) || 0;
+           var minimum = d3.min(all_bytes) || 0;
 
            $("#max").html(maximum.toFixed(2));
            $("#avg").html(average.toFixed(2));
@@ -467,14 +518,14 @@
              });
            });
 
-           level = Math.log10(d3.max(all_bytes));
-           if (level > 9) {
+           level = Math.log2(d3.max(all_bytes));
+           if (level > 27) {
              ratio = 1024 * 1024 * 1024;
              unit = "Gbps";
-           } else if (level > 6) {
+           } else if (level > 17) {
              ratio = 1024 * 1024;
              unit = "Mbps";
-           } else if (level > 3) {
+           } else if (level > 7) {
              ratio = 1024;
              unit = "Kbps";
            } else {
@@ -486,9 +537,9 @@
              return 8 * d / ratio;
            });
 
-           var maximum = d3.max(all_bytes);
-           var average = d3.mean(all_bytes);
-           var minimum = d3.min(all_bytes);
+           var maximum = d3.max(all_bytes) || 0;
+           var average = d3.mean(all_bytes) || 0;
+           var minimum = d3.min(all_bytes) || 0;
 
            $("#max").html(maximum.toFixed(2));
            $("#avg").html(average.toFixed(2));
@@ -546,14 +597,14 @@
              });
            });
 
-           level = Math.log10(d3.max(all_bytes));
-           if (level > 9) {
+           level = Math.log2(d3.max(all_bytes));
+           if (level > 27) {
              ratio = 1024 * 1024 * 1024;
              unit = "Gbps";
-           } else if (level > 6) {
+           } else if (level > 17) {
              ratio = 1024 * 1024;
              unit = "Mbps";
-           } else if (level > 3) {
+           } else if (level > 7) {
              ratio = 1024;
              unit = "Kbps";
            } else {
@@ -565,9 +616,9 @@
              return 8 * d / ratio;
            });
 
-           var maximum = d3.max(all_bytes);
-           var average = d3.mean(all_bytes);
-           var minimum = d3.min(all_bytes);
+           var maximum = d3.max(all_bytes) || 0;
+           var average = d3.mean(all_bytes) || 0;
+           var minimum = d3.min(all_bytes) || 0;
 
            $("#max").html(maximum.toFixed(2));
            $("#avg").html(average.toFixed(2));

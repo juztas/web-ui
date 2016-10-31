@@ -11,37 +11,50 @@ $("#zoom-mode").click(function(e) {
 
 $("#show-single-flow").click(function(e) {
   plot_mode = SINGLE_FLOW;
+  $('#flip').prop('disabled', false);
   clearInterval(plot_flow_interval);
   plot_flow_traffic();
-  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-round-trip").click(function(e) {
   plot_mode = ROUND_TRIP;
+  $('#flip').prop('disabled', true);
   clearInterval(plot_flow_interval);
   plot_flow_traffic();
-  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-path").click(function(e) {
   plot_mode = EXPLORE_PATH;
+  $('#flip').prop('disabled', false);
   clearInterval(plot_flow_interval);
   plot_flow_traffic();
-  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-round-trip-path").click(function(e) {
   plot_mode = EXPLORE_ROUND_TRIP_PATH;
+  $('#flip').prop('disabled', true);
   clearInterval(plot_flow_interval);
   plot_flow_traffic();
-  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 $("#show-all-flow").click(function(e) {
   plot_mode = ALL_FLOW;
+  $('#flip').prop('disabled', true);
   clearInterval(plot_flow_interval);
   plot_flow_traffic();
-  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+});
+
+$("#flip").click(function(e) {
+  $(this).toggleClass("active");
+  flip = !flip;
+  clearInterval(plot_flow_interval);
+  plot_flow_traffic();
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 });
 
 var TIME_SCALE_MAP = {
@@ -61,7 +74,7 @@ $("[id^=last-]").click(function(e) {
   time_scale = TIME_SCALE_MAP[scale];
   clearInterval(plot_flow_interval);
   plot_flow_traffic();
-  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
+  plot_flow_interval = setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 })
 
 /* Save positions */
