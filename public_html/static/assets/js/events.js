@@ -140,16 +140,19 @@ d3.select('#change-host-label-customize').on('click', function() {
 
 $('#L2RouteCalculationModal').on('show.bs.modal', function (event) {
   var modal = $(this);
-  var source = modal.find("#l2source")[0];
-  var destination = modal.find("#l2destination")[0];
-  hosts = chart.get_all_hosts();
+  var source = modal.find("#l2source");
+  var destination = modal.find("#l2destination");
+  var hosts = chart.get_all_hosts();
 
-  while (source.children.length > 0) {
-    source.children[0].remove();
-  }
+  source.html('');
+  destination.html('');
 
-  while (destination.children.length >0) {
-    destination.children[0].remove();
+  for(var i = 0; i < hosts.length; i++) {
+    var opt = hosts[i]['node-id'];
+    var el = document.createElement("option");
+    el.textContent = opt;
+    el.value = opt;
+    source.append(el);
   }
 
   for(var i = 0; i < hosts.length; i++) {
@@ -157,20 +160,12 @@ $('#L2RouteCalculationModal').on('show.bs.modal', function (event) {
     var el = document.createElement("option");
     el.textContent = opt;
     el.value = opt;
-    source.appendChild(el);
+    destination.append(el);
   }
 
-  for(var i = 0; i < hosts.length; i++) {
-    var opt = hosts[i]['node-id'];
-    var el = document.createElement("option");
-    el.textContent = opt;
-    el.value = opt;
-    destination.appendChild(el);
-  }
-
-  modal.find("#source-gateway").prop('disabled', true);
+  modal.find("#l2source-gateway").prop('disabled', true);
   modal.find("#enable-l2source-gateway").bootstrapToggle('off');
-  modal.find("#destination-gateway").prop('disabled', true);
+  modal.find("#l2destination-gateway").prop('disabled', true);
   modal.find("#enable-l2destination-gateway").bootstrapToggle('off');
 
 });
@@ -220,7 +215,7 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
 
 $('#enable-l2source-gateway').change(function() {
   var modal = $("#L2RouteCalculationModal");
-  var source_gateway = modal.find('#source-gateway');
+  var source_gateway = modal.find('#l2source-gateway');
   var source = modal.find("#l2source");
   if ($(this).prop('checked')) {
     source_gateway.prop('disabled', false);
@@ -239,7 +234,7 @@ $('#enable-l2source-gateway').change(function() {
     $("#l2source-input").show();
   } else {
     $("#l2source-input").hide();
-    $('#source-gateway').prop('disabled', true);
+    $('#l2source-gateway').prop('disabled', true);
     source_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
 
     var hosts = chart.get_all_hosts();
@@ -255,7 +250,7 @@ $('#enable-l2source-gateway').change(function() {
   }
 });
 
-$('#source-gateway').change(function() {
+$('#l2source-gateway').change(function() {
   if (!$(this).prop('disabled')) {
     var ports = chart.get_all_ports_in_switch($(this).val());
     var source = $('#l2source');
@@ -274,7 +269,7 @@ $('#source-gateway').change(function() {
 
 $('#enable-l2destination-gateway').change(function() {
   var modal = $("#L2RouteCalculationModal");
-  var destination_gateway = modal.find('#destination-gateway');
+  var destination_gateway = modal.find('#l2destination-gateway');
   var destination = modal.find("#l2destination");
   if ($(this).prop('checked')) {
     destination_gateway.prop('disabled', false);
@@ -293,7 +288,7 @@ $('#enable-l2destination-gateway').change(function() {
     $("#l2destination-input").show();
   } else {
     $("#l2destination-input").hide();
-    $('#destination-gateway').prop('disabled', true);
+    $('#l2destination-gateway').prop('disabled', true);
     destination_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
 
     var hosts = chart.get_all_hosts();
@@ -310,7 +305,7 @@ $('#enable-l2destination-gateway').change(function() {
   }
 });
 
-$('#destination-gateway').change(function() {
+$('#l2destination-gateway').change(function() {
   if (!$(this).prop('disabled')) {
     var ports = chart.get_all_ports_in_switch($(this).val());
     var destination = $('#l2destination');
@@ -329,45 +324,43 @@ $('#destination-gateway').change(function() {
 
 $('#L3RouteCalculationModal, #ALTORouteCalculationModal').on('show.bs.modal', function (event) {
   var modal = $(this);
-  var source = modal.find("#l3source")[0];
-  var destination = modal.find("#l3destination")[0];
-  hosts = chart.get_all_hosts();
+  var source = modal.find("#l3source");
+  var destination = modal.find("#l3destination");
+  var hosts = chart.get_all_hosts();
 
-  while (source.children.length > 0) {
-    source.children[0].remove();
-  }
-
-  while (destination.children.length >0) {
-    destination.children[0].remove();
-  }
+  source.html('');
+  destination.html('');
 
   for(var i = 0; i < hosts.length; i++) {
-    addresses = hosts[i]['host-tracker-service:addresses'];
+    var addresses = hosts[i]['host-tracker-service:addresses'];
     for (var j = 0; j < addresses.length; j++) {
-      ip = addresses[j]['ip'];
-      mac = addresses[j]['mac'];
+      var ip = addresses[j]['ip'];
+      var mac = addresses[j]['mac'];
 
       var el = document.createElement("option");
       el.textContent = ip + " - " + mac;
       el.value = ip;
-      source.appendChild(el);
-
+      source.append(el);
     }
   }
 
   for(var i = 0; i < hosts.length; i++) {
-    addresses = hosts[i]['host-tracker-service:addresses'];
+    var addresses = hosts[i]['host-tracker-service:addresses'];
     for (var j = 0; j < addresses.length; j++) {
-      ip = addresses[j]['ip'];
-      mac = addresses[j]['mac'];
+      var ip = addresses[j]['ip'];
+      var mac = addresses[j]['mac'];
 
       var el = document.createElement("option");
       el.textContent = ip + " - " + mac;
       el.value = ip;
-      destination.appendChild(el);
-
+      destination.append(el);
     }
   }
+
+  modal.find("#l3source-gateway").prop('disabled', true);
+  modal.find("#enable-l3source-gateway").bootstrapToggle('off');
+  modal.find("#l3destination-gateway").prop('disabled', true);
+  modal.find("#enable-l3destination-gateway").bootstrapToggle('off');
 
   var enable = modal.find("#enable-rate-limit");
   var rl = modal.find("#rate-limit");
@@ -454,6 +447,15 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
   var modal = $("#L3RouteCalculationModal");
   var source = modal.find("#l3source")[0]['value'];
   var destination = modal.find("#l3destination")[0]['value'];
+  var enable_source_gateway = modal.find("#enable-l3source-gateway").prop('checked');
+  var source_ip, destination_ip;
+  if (enable_source_gateway) {
+    source_ip = modal.find("#l3source-address").val();
+  }
+  var enable_destination_gateway = modal.find("#enable-l3destination-gateway").prop('checked');
+  if (enable_destination_gateway) {
+    destination_ip = modal.find("#l3destination-address").val();
+  }
 
   // Remote Store
   $.ajax({
@@ -469,7 +471,9 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
       }
     },
     data: JSON.stringify({'source': source,
-                          'destination': destination}),
+                          'source-ip': source_ip || '',
+                          'destination': destination,
+                          'destination-ip': destination_ip || ''}),
     success: function (data) {
       display_paths(source, destination, data['paths']);
       modal.modal('toggle');
@@ -480,6 +484,125 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
     dataType: "json"
   });
 
+});
+
+$('#enable-l3source-gateway').change(function() {
+  var modal = $("#L3RouteCalculationModal");
+  var source_gateway = modal.find('#l3source-gateway');
+  var source = modal.find("#l3source");
+  if ($(this).prop('checked')) {
+    source_gateway.prop('disabled', false);
+    var switches = chart.get_all_switches();
+
+    source_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+    source.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
+
+    switches.forEach(function(sw) {
+      var opt = sw.id + ' - ' + sw.customize;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = sw.id;
+      source_gateway.append(el);
+    });
+    $("#l3source-input").show();
+  } else {
+    $("#l3source-input").hide();
+    $('#l3source-gateway').prop('disabled', true);
+    source_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+
+    var hosts = chart.get_all_hosts();
+    source.html('');
+
+    for(var i = 0; i < hosts.length; i++) {
+      var addresses = hosts[i]['host-tracker-service:addresses'];
+      for (var j = 0; j < addresses.length; j++) {
+        var ip = addresses[j]['ip'];
+        var mac = addresses[j]['mac'];
+
+        var el = document.createElement("option");
+        el.textContent = ip + " - " + mac;
+        el.value = ip;
+        source.append(el);
+      }
+    }
+  }
+});
+
+$('#l3source-gateway').change(function() {
+  if (!$(this).prop('disabled')) {
+    var ports = chart.get_all_ports_in_switch($(this).val());
+    var source = $('#l3source');
+
+    source.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
+
+    ports.forEach(function(port) {
+      var opt = port.id + ' - ' + port.name;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = port.id;
+      source.append(el);
+    });
+  }
+});
+
+$('#enable-l3destination-gateway').change(function() {
+  var modal = $("#L3RouteCalculationModal");
+  var destination_gateway = modal.find('#l3destination-gateway');
+  var destination = modal.find("#l3destination");
+  if ($(this).prop('checked')) {
+    destination_gateway.prop('disabled', false);
+    var switches = chart.get_all_switches();
+
+    destination_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+    destination.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
+
+    switches.forEach(function(sw) {
+      var opt = sw.id + ' - ' + sw.customize;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = sw.id;
+      destination_gateway.append(el);
+    });
+    $("#l3destination-input").show();
+  } else {
+    $("#l3destination-input").hide();
+    $('#l3destination-gateway').prop('disabled', true);
+    destination_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+
+    var hosts = chart.get_all_hosts();
+
+    destination.html('');
+
+    for(var i = 0; i < hosts.length; i++) {
+      var addresses = hosts[i]['host-tracker-service:addresses'];
+      for (var j = 0; j < addresses.length; j++) {
+        var ip = addresses[j]['ip'];
+        var mac = addresses[j]['mac'];
+
+        var el = document.createElement("option");
+        el.textContent = ip + " - " + mac;
+        el.value = ip;
+        destination.append(el);
+      }
+    }
+  }
+});
+
+$('#l3destination-gateway').change(function() {
+  if (!$(this).prop('disabled')) {
+    var ports = chart.get_all_ports_in_switch($(this).val());
+    var destination = $('#l3destination');
+
+    destination.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
+
+    ports.forEach(function(port) {
+      var opt = port.id + ' - ' + port.name;
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = port.id;
+      destination.append(el);
+    });
+  }
 });
 
 $("#ALTORouteManagementTab").click(function(e) {

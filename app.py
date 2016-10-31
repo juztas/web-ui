@@ -402,12 +402,18 @@ def l3routes():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     source = data['source']
     destination = data['destination']
+    source_ip = data['source-ip']
+    destination_ip = data['destination-ip']
 
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
     graph = odl.topology.get_networkx_graph()
 
     source_id, dest_id = None, None
+    if source_ip:
+        source_id = source
+    if destination_ip:
+        dest_id = destination
 
     # Theses are topology nodes
     # TODO: Topology nodes should be of same type of a normal node.
@@ -418,10 +424,10 @@ def l3routes():
         if (node_id.split(":")[0] == "host"):
             ips = node['host-tracker-service:addresses']
             for ip in ips:
-                if ip['ip'] == source:
+                if not source_id and ip['ip'] == source:
                     source_id = "host:%s" % ip['mac']
 
-                if ip['ip'] == destination:
+                if not dest_id and ip['ip'] == destination:
                     dest_id = "host:%s" % ip['mac']
 
     if not source_id or not dest_id:
@@ -433,8 +439,14 @@ def l3routes():
     paths = []
     for path in nx.all_simple_paths(graph, source_id, dest_id):
         uid = "%s" % uuid.uuid1()
-        path[0] = source
-        path[-1] = destination
+        if source_ip:
+            path = [source_ip] + path
+        else:
+            path[0] = source
+        if destination_ip:
+            path.append(destination_ip)
+        else:
+            path[-1] = destination
         paths.append({'uid': uid, 'path': path})
         session_l3paths[client_ip][uid] = path
 
