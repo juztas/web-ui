@@ -361,6 +361,8 @@ def l2routes():
     data = json.loads(flask.request.get_data().decode('utf-8'))
     source = data['source']
     destination = data['destination']
+    source_mac = data['source-mac']
+    destination_mac = data['destination-mac']
 
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
@@ -372,6 +374,10 @@ def l2routes():
     paths = []
     for path in nx.all_simple_paths(graph, source, destination):
         uid = "%s" % uuid.uuid1()
+        if source_mac:
+            path = ['host:' + source_mac] + path
+        if destination_mac:
+            path.append('host:' + destination_mac)
         paths.append({'uid': uid, 'path': path})
         session_l2paths[client_ip][uid] = path
 
@@ -765,7 +771,8 @@ def delete_flow(node_id, table_id, flow_id):
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
 
-    delete_all = flask.request.form.get('delete_all')
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    delete_all = data['delete_all']
 
     try:
         # Get the node object

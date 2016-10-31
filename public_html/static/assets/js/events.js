@@ -59,6 +59,9 @@ var TIME_SCALE_MAP = {
 $("[id^=last-]").click(function(e) {
   var scale = $(this).attr('id');
   time_scale = TIME_SCALE_MAP[scale];
+  clearInterval(plot_flow_interval);
+  plot_flow_traffic();
+  setInterval(plot_flow_traffic, REFRESH_FREQ * 1000);
 })
 
 /* Save positions */
@@ -176,6 +179,15 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
   var modal = $('#L2RouteCalculationModal');
   var source = modal.find("#l2source")[0]['value'];
   var destination = modal.find("#l2destination")[0]['value'];
+  var enable_source_gateway = modal.find("#enable-l2source-gateway").prop('checked');
+  var source_mac, destination_mac;
+  if (enable_source_gateway) {
+    source_mac = modal.find("#l2source-address").val();
+  }
+  var enable_destination_gateway = modal.find("#enable-l2destination-gateway").prop('checked');
+  if (enable_destination_gateway) {
+    destination_mac = modal.find("#l2destination-address").val();
+  }
 
   // Remote Store
   $.ajax({
@@ -191,7 +203,9 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
       }
     },
     data: JSON.stringify({'source': source,
-                          'destination': destination}),
+                          'source-mac': source_mac || '',
+                          'destination': destination,
+                          'destination-mac': destination_mac || ''}),
     success: function (data) {
       display_paths(source, destination, data['paths']);
       modal.modal('toggle');
@@ -205,12 +219,15 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
 });
 
 $('#enable-l2source-gateway').change(function() {
+  var modal = $("#L2RouteCalculationModal");
+  var source_gateway = modal.find('#source-gateway');
+  var source = modal.find("#l2source");
   if ($(this).prop('checked')) {
-    var source_gateway = $('#source-gateway');
     source_gateway.prop('disabled', false);
     var switches = chart.get_all_switches();
 
-    source_gateway.html('');
+    source_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+    source.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
 
     switches.forEach(function(sw) {
       var opt = sw.id + ' - ' + sw.customize;
@@ -219,35 +236,21 @@ $('#enable-l2source-gateway').change(function() {
       el.value = sw.id;
       source_gateway.append(el);
     });
+    $("#l2source-input").show();
   } else {
+    $("#l2source-input").hide();
     $('#source-gateway').prop('disabled', true);
-    var modal = $("#L2RouteCalculationModal");
-    var source = modal.find("#l2source")[0];
-    var destination = modal.find("#l2destination")[0];
+    source_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+
     var hosts = chart.get_all_hosts();
-
-    while (source.children.length > 0) {
-      source.children[0].remove();
-    }
-
-    while (destination.children.length >0) {
-      destination.children[0].remove();
-    }
+    source.html('');
 
     for(var i = 0; i < hosts.length; i++) {
       var opt = hosts[i]['node-id'];
       var el = document.createElement("option");
       el.textContent = opt;
       el.value = opt;
-      source.appendChild(el);
-    }
-
-    for(var i = 0; i < hosts.length; i++) {
-      var opt = hosts[i]['node-id'];
-      var el = document.createElement("option");
-      el.textContent = opt;
-      el.value = opt;
-      destination.appendChild(el);
+      source.append(el);
     }
   }
 });
@@ -257,7 +260,7 @@ $('#source-gateway').change(function() {
     var ports = chart.get_all_ports_in_switch($(this).val());
     var source = $('#l2source');
 
-    source.html('');
+    source.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
 
     ports.forEach(function(port) {
       var opt = port.id + ' - ' + port.name;
@@ -270,12 +273,15 @@ $('#source-gateway').change(function() {
 });
 
 $('#enable-l2destination-gateway').change(function() {
+  var modal = $("#L2RouteCalculationModal");
+  var destination_gateway = modal.find('#destination-gateway');
+  var destination = modal.find("#l2destination");
   if ($(this).prop('checked')) {
-    var destination_gateway = $('#destination-gateway');
     destination_gateway.prop('disabled', false);
     var switches = chart.get_all_switches();
 
-    destination_gateway.html('');
+    destination_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+    destination.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
 
     switches.forEach(function(sw) {
       var opt = sw.id + ' - ' + sw.customize;
@@ -284,8 +290,23 @@ $('#enable-l2destination-gateway').change(function() {
       el.value = sw.id;
       destination_gateway.append(el);
     });
+    $("#l2destination-input").show();
   } else {
+    $("#l2destination-input").hide();
     $('#destination-gateway').prop('disabled', true);
+    destination_gateway.html('<option value="" disabled selected style="display:none;">Choose a gateway</option>');
+
+    var hosts = chart.get_all_hosts();
+
+    destination.html('');
+
+    for(var i = 0; i < hosts.length; i++) {
+      var opt = hosts[i]['node-id'];
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = opt;
+      destination.append(el);
+    }
   }
 });
 
@@ -294,7 +315,7 @@ $('#destination-gateway').change(function() {
     var ports = chart.get_all_ports_in_switch($(this).val());
     var destination = $('#l2destination');
 
-    destination.html('');
+    destination.html('<option value="" disabled selected style="display:none;">Choose a gateway port</option>');
 
     ports.forEach(function(port) {
       var opt = port.id + ' - ' + port.name;
@@ -732,9 +753,9 @@ $('#PathFlowsConfirmationModal').on('show.bs.modal', function (event) {
       $("#l2l3destination").val(destination);
     }
   }
-  if (source.startsWith("openflow:") || destination.startsWith("openflow:")) {
-    $("#pathMatchForm").hide();
-  }
+  // if (source.startsWith("openflow:") || destination.startsWith("openflow:")) {
+  //   $("#pathMatchForm").hide();
+  // }
 
   var modal = $(this);
   var type = modal.find("#type")[0].value;
@@ -847,6 +868,7 @@ var submitFormData = function(endpoint, data) {
   $.ajax({
     type: "POST",
     url: endpoint,
+    contentType: "applicaiton/json; charset=utf-8",
     headers: {
       "Authorization": "Basic " + (Cookies.get('auth') || "")
     },
@@ -855,7 +877,7 @@ var submitFormData = function(endpoint, data) {
         window.location.href = "/login.html";
       }
     },
-    data: data,
+    data: JSON.stringify(data),
     success: function (data) {
       window.location.href = "/";
     }

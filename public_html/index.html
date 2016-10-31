@@ -158,11 +158,9 @@
           <div class="modal-body" id="modal-msg">
             <form id ="routeCalculationForm" action="#" method="POST" class="form-horizontal">
               <div class="form-group">
-                <div class="col-sm-8">
-                  <label for="enable-l2source-gateway" class="checkbox-inline">
-                    <input id="enable-l2source-gateway" name="enable-l2source-gateway" type="checkbox" data-toggle="toggle">
-                    Try to find the path FROM a GATEWAY port?
-                  </label>
+                <div class="col-sm-12">
+                  Try to find the path FROM a GATEWAY port?
+                  <input id="enable-l2source-gateway" name="enable-l2source-gateway" type="checkbox" data-toggle="toggle">
                 </div>
                 <div class="col-sm-4">
                   <select id="source-gateway" name="source-gateway" disabled class="form-control">
@@ -178,16 +176,20 @@
                 </select>
                 </div>
               </div>
+              <div id="l2source-input" style="display:none;" class="form-group">
+                <label for="l2source-address" class="col-sm-2 control-label">Source Address:</label>
+                <div class="col-sm-10">
+                  <input id="l2source-address" name="l2source-address" class="form-control" placeholder="Specify the MAC address for source">
+                </div>
+              </div>
               <div class="form-group">
-                <div class="col-sm-8">
-                  <label for="enable-l2destination-gateway" class="checkbox-inline">
-                    <input id="enable-l2destination-gateway" name="enable-l2destination-gateway" type="checkbox" data-toggle="toggle">
-                    Try to find the path TO a GATEWAY port?
-                  </label>
+                <div class="col-sm-12">
+                  Try to find the path TO a GATEWAY port?
+                  <input id="enable-l2destination-gateway" name="enable-l2destination-gateway" type="checkbox" data-toggle="toggle">
                 </div>
                 <div class="col-sm-4">
                   <select id="destination-gateway" name="destination-gateway" disabled class="form-control">
-                    <option>Choose a gateway</option>
+                    <option value="" disabled selected style="display:none;">Choose a gateway</option>
                   </select>
                 </div>
               </div>
@@ -197,6 +199,12 @@
                 <select id="l2destination" name="destination" class="form-control">
                   <option>Choose a destination host</option>
                 </select>
+                </div>
+              </div>
+              <div id="l2destination-input" style="display:none;" class="form-group">
+                <label for="l2destination-address" class="col-sm-2 control-label">Destination:</label>
+                <div class="col-sm-10">
+                  <input id="l2destination-address" name="l2destination-address" class="form-control" placeholder="Specify the MAC address for destination">
                 </div>
               </div>
           </div>
@@ -505,12 +513,6 @@
             Do you wanna install flows on this path ?
             <form id="pathMatchForm" action="#" method="POST" class="form-horizontal">
               <div class="form-group">
-                <div class="col-sm-12">
-                  <strong>The match information is not complete. You need to specify IP/MAC addresses:</strong>
-                </div>
-              </div>
-
-              <div class="form-group">
                 <label for="source" class="col-sm-2 control-label">Source:</label>
                 <div class="col-sm-10">
                   <input id="l2l3source" name="source" class="form-control" placeholder="Specify the ip/mac address for source">
@@ -528,6 +530,7 @@
                     <input type="checkbox" id="default-match">I don't know. Specify as ANY.
                   </label>
                 </div>
+              </div>
             </form>
           </div>
           <div class="modal-footer">
