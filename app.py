@@ -199,15 +199,15 @@ def install_flow(node_id, table_id):
     except (NodeNotFound, TableNotFound) as e:
         flask.abort(404)
 
-    form = flask.request.form
-    table.install_flow(priority = form.get('priority'),
-                       name = form.get('name'),
-                       eth_type = form.get('eth_type'),
-                       eth_source = form.get('eth_source'),
-                       eth_destination = form.get('eth_destination'),
-                       ipv4_source = form.get('ipv4_source'),
-                       ipv4_destination = form.get('ipv4_destination'),
-                       connector_id = form.get('output'),
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    table.install_flow(priority = data.get('priority'),
+                       name = data.get('name'),
+                       eth_type = data.get('eth_type'),
+                       eth_source = data.get('eth_source'),
+                       eth_destination = data.get('eth_destination'),
+                       ipv4_source = data.get('ipv4_source'),
+                       ipv4_destination = data.get('ipv4_destination'),
+                       connector_id = data.get('output'),
                        template_dir = template_dir)
     return flask.redirect("/")
 
