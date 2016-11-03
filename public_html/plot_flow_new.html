@@ -85,9 +85,10 @@
 
           <div class="row">
             <div class="col-md-12" style="position:absolute">
-              <h3 style="color:white;margin:30px 100px 30px 50px;">
+              <h3 class="pull-right" style="color:white;margin:30px 100px 30px 50px;">
                 <strong>Flow name:</strong> <span id="name"></span>
-                <span class="pull-right">
+                <br />
+                <span>
                   Max: <span id="max">0.0</span> <span class="unit">Gbps</span>,
                   Avg: <span id="avg">0.0</span> <span class="unit">Gbps</span>,
                   Min: <span id="min">0.0</span> <span class="unit">Gbps</span>
@@ -157,7 +158,8 @@
          legend: {
            font: {
              color: 'white'
-           }
+           },
+           orientation: 'h'
          }
        }
      };
@@ -194,7 +196,7 @@
      var last = new Date(now - 60*15);
      // Define the lines
      var bytesline = create_scatter_line([now, last], [0, 0], 'main', '');
-     var bytesline2 = create_scatter_line([now, last], [0, 0], 'oposite', '');
+     var bytesline2 = create_scatter_line([now, last], [0, 0], 'return', '');
 
      plotDiv = document.getElementById("plot-flow-d3");
      Plotly.newPlot(plotDiv, [bytesline, bytesline2], layout(), {showLink: false});
@@ -248,7 +250,7 @@
                main_bytes_line = main_bytes_line.map(function(d) {
                  return 0;
                });
-               show_msg("There is no oposite flow in this node", "alert-warning", 3000);
+               show_msg("There is no return flow in this node", "alert-warning", 3000);
              }
            }
 
@@ -292,7 +294,7 @@
            if (round_trip && oposite_bytes_line) {
              plotDiv.data.push(
                create_scatter_line(oposite_time_line, oposite_bytes_line,
-                                   "oposite: " + node + ' - ' + clean_id, node)
+                                   "return: " + node + ' - ' + clean_id, node)
              );
            }
            clear_plot_div();
@@ -355,7 +357,7 @@
                  main_bytes_line = main_bytes_line.map(function(d) {
                    return 0;
                  });
-                 show_msg("There is no oposite flow in some nodes", "alert-warning", 3000);
+                 show_msg("There is no return flow in some nodes", "alert-warning", 3000);
                }
              }
 
@@ -394,7 +396,7 @@
                  node.main_bytes_line = main_bytes_line.map(function(d) {
                    return 0;
                  });
-                 show_msg("There is no oposite flow in node: " + n.id, "alert-warning", 3000);
+                 show_msg("There is no return flow in node: " + n.id, "alert-warning", 3000);
                }
              }
 
@@ -471,7 +473,7 @@
                });
                data.push(
                  create_scatter_line(n.oposite_time_line, n.oposite_bytes_line,
-                                     'oposite: ' + n.id, n.id)
+                                     'return: ' + n.id, n.id)
                );
              }
              Plotly.newPlot(div, data, layout(unit, {t: 30, r: 20, b: 30, l: 50}, plot_height), {showLink: false});
@@ -604,7 +606,7 @@
                main_bytes_line = main_bytes_line.map(function(d) {
                  return 0;
                });
-               show_msg("There is no oposite path between these two endpoints", "alert-warning", 3000);
+               show_msg("There is no return path between these two endpoints", "alert-warning", 3000);
              }
            }
 
