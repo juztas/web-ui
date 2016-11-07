@@ -464,10 +464,12 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
   var source_ip, destination_ip;
   if (enable_source_gateway) {
     source_ip = modal.find("#l3source-address").val();
+    source_ip = source_ip || '*';
   }
   var enable_destination_gateway = modal.find("#enable-l3destination-gateway").prop('checked');
   if (enable_destination_gateway) {
     destination_ip = modal.find("#l3destination-address").val();
+    destination_ip = destination_ip || '*';
   }
 
   // Remote Store

@@ -447,11 +447,11 @@ def l3routes():
     paths = []
     for path in nx.all_simple_paths(graph, source_id, dest_id):
         uid = "%s" % uuid.uuid1()
-        if source_ip:
+        if source_ip and source_ip != '*':
             path = [source_ip] + path
         else:
             path[0] = source
-        if destination_ip:
+        if destination_ip and destination_ip != '*':
             path.append(destination_ip)
         else:
             path[-1] = destination
@@ -561,8 +561,9 @@ def install_flows_for_l3path(path_id):
 
     ports = get_ports_on_path(path)
 
-    source_host = path[0]
-    target_host = path[-1]
+    data = json.loads(flask.request.get_data().decode('utf-8'))
+    source_host = data['source']
+    target_host = data['destination']
 
     # Install a flow in each switch on the path with correct output
     # port.
@@ -592,16 +593,16 @@ def install_flows_for_l3path(path_id):
         table.l3output(flow_name = "L3AR%s" % path_id.split("-")[0],
                        in_port = source_port,
                        connector_id = target_port,
-                       source = "%s/32" % source_host,
-                       destination = "%s/32" % target_host,
+                       source = source_host and "%s/32" % source_host,
+                       destination = target_host and "%s/32" % target_host,
                        template_dir = template_dir)
 
         # Install the flow another way
         table.l3output(flow_name = "L3AR%s" % path_id.split("-")[0],
                        in_port = target_port,
                        connector_id = source_port,
-                       source = "%s/32" % target_host,
-                       destination = "%s/32" % source_host,
+                       source = target_host and "%s/32" % target_host,
+                       destination = source_host and "%s/32" % source_host,
                        template_dir = template_dir)
 
     cache_l3paths[path_id] = path
