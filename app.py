@@ -525,6 +525,7 @@ def install_flows_for_l2path(path_id):
 
         # Install the flow one way
         table.l2output(flow_name = "L2AR%s" % path_id.split("-")[0],
+                       in_port = source_port,
                        connector_id = target_port,
                        source = source_host,
                        destination = target_host,
@@ -532,6 +533,7 @@ def install_flows_for_l2path(path_id):
 
         # Install the flow another way
         table.l2output(flow_name = "L2AR%s" % path_id.split("-")[0],
+                       in_port = target_port,
                        connector_id = source_port,
                        source = target_host,
                        destination = source_host,
@@ -588,6 +590,7 @@ def install_flows_for_l3path(path_id):
 
         # Install the flow one way
         table.l3output(flow_name = "L3AR%s" % path_id.split("-")[0],
+                       in_port = source_port,
                        connector_id = target_port,
                        source = "%s/32" % source_host,
                        destination = "%s/32" % target_host,
@@ -595,6 +598,7 @@ def install_flows_for_l3path(path_id):
 
         # Install the flow another way
         table.l3output(flow_name = "L3AR%s" % path_id.split("-")[0],
+                       in_port = target_port,
                        connector_id = source_port,
                        source = "%s/32" % target_host,
                        destination = "%s/32" % source_host,

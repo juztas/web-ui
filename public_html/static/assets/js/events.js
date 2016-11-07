@@ -916,7 +916,7 @@ $('#FlowRemoveModal').on('show.bs.modal', function (event) {
   var node_id = button.data('node');
   var flow_name = button.data('name');
 
-  var endpoint = "/api/flow/" + node_id + "/" + table_id + "/" + flow_id + "/delete";
+  var endpoint = "/api/flow/" + node_id + "/" + table_id + "/" + escape(flow_id) + "/delete";
 
   var modal = $(this);
 
