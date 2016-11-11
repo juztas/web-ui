@@ -41,6 +41,9 @@ RUN sed -i 's/steps = 60//' /stats-watchdog/scripts/ofng-watchdog \
 RUN ln -s /var/www/ofng/web-ui/settings/production.py /stats-watchdog/settings/default.py
 ENV PYTHONPATH /stats-watchdog
 
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Supervisor configuration for apache2
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor
 COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
