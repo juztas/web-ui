@@ -14,8 +14,16 @@ You can use docker container to start a server instance quickly. Just make sure 
 
     ./build.sh
     cp -r settings settings.docker
-    # Config your own settings file
-    ./run
+
+    # Manually: Config your own settings file
+    # In this step, you need to modify the file settings.docker/production.py
+    # You have to change the following parts at least:
+    # 1) Change the odl_server
+    # 2) Change the rrd_dir = "/var/log/rrd/ofng"
+    # 3) Add rrd_path = "/var/log/rrd/ofng"
+    # 4) Add steps = <interval_time>
+
+    ./run.sh
 
 ## Authors
 
