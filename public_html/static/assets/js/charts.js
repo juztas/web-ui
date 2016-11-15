@@ -38,7 +38,7 @@ var D3Force = function(nodes, links, div) {
 
   var tick_times = 100;
 
-  var positions_cache;
+  this.positions_cache = {};
 
   this.switch_labels_type = "ip_address";
   this.host_labels_type = "ip";
@@ -655,6 +655,20 @@ var D3Force = function(nodes, links, div) {
     .on("dblclick.zoom", null)
     .append('svg:g');
 
+  this.svg.append('defs')
+    .append('pattern')
+    .attr('id', 'mellanox')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 100)
+    .attr('height', 100)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/mellanox.jpg")
+    // .attr("src", "/static/assets/images/mellanox.jpg")
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', 100)
+    .attr('height', 100);
+
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
     .enter().append("path")
@@ -815,11 +829,25 @@ var D3Force = function(nodes, links, div) {
   this.node.append("circle")
     .attr('pointer-events', 'all')
     .attr("class", function(d) {
+      if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
+        return "mellanox-circle";
+      }
+      else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('dell')) {
+        return "dell-circle";
+      }
       return d['type'] + "-circle";
     })
     .attr("r", function(d) {
       return size[d.type];
     });
+
+  // this.node.append("rect")
+  //   .attr("class", function(d) {
+  //     if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
+  //       return "mellanox-circle";
+  //     }
+  //     return '';
+  //   });
 
   d3.selectAll(".host")
     .append("text")
