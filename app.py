@@ -59,7 +59,7 @@ def get_rrd_stats(node_id, table_id, clean_flow_id, diff=60 * 15):
 
     data = []
     if os.path.isfile(filename):
-        result = rrdtool.fetch(filename, 'AVERAGE', '--start', str(begin), '--end', str(end), '-r', str(10))
+        result = rrdtool.fetch(filename, 'AVERAGE', '--start', str(begin), '--end', str(end), '-r', str(30))
         keys = result[1]
         values = result[2]
         begin = result[0][0]
