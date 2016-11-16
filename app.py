@@ -349,6 +349,29 @@ def e2e_stats(path_id, diff):
                           'source': source_host,
                           'target': target_host})
 
+@app.route('/stats/all', methods=['GET'])
+@requires_auth
+def all_stats():
+    """
+    Get all statistics information for each node
+    """
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    nodes = odl.get_nodes()
+    all_stats = {}
+    for node in nodes.values():
+        tables = node.get_tables()
+        for table in tables.values():
+            for flow in table.get_all_flows().values():
+                for action in flow.get_actions():
+                    if action['type'] == 'output-action':
+                        connector = node.id + ":" + action['value']
+                        stat = get_rrd_stats(node.id, table.id, flow.clean_id, 120)
+                        rates = map(lambda x: x['bytes'], stat)
+                        rate = sum(rates) / len(rates) if rates else 0
+                        all_stats[connector] = all_stats.get(connector, 0) + rate
+    return flask.jsonify(all_stats)
+
 
 @app.route('/routes/l2', methods=['POST'])
 @requires_auth
