@@ -42,7 +42,7 @@
 
 .active-link {
   stroke-dasharray: 100;
-  animation: dash 5s linear;
+  animation: dash 100000s linear;
 }
 
 @keyframes dash {
