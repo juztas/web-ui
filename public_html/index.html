@@ -786,8 +786,15 @@ information: <br><br>
                stats[source] = 0.3 + 0.7 * stat/3;
              });
 
+             d3.selectAll(".link-link, .host-link")
+               .style("opacity", "0.3")
+               .style("cursor", null)
+               .classed('active-link', false);
+
              Object.keys(stats).forEach(function (source) {
-               d3.selectAll('.link-' + source).style("opacity", stats[source]);
+               d3.selectAll('.link-' + source)
+                 .style("opacity", stats[source])
+                 .classed('active-link', true);
              });
            },
            dataType: "json"
