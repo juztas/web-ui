@@ -64,16 +64,6 @@
   fill: #FFCC00;
 }
 
-.mellanox-circle {
-  stroke-width: 0px;
-  fill: url(/index.html#mellanox);
-}
-
-.dell-circle {
-  stroke-width: 0px;
-  fill: url(/index.html#dell);
-}
-
 node {
   display: none;
   position: absolute;

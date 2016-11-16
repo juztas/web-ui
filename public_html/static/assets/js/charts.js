@@ -40,8 +40,8 @@ var D3Force = function(nodes, links, div) {
 
   this.positions_cache = {};
 
-  this.switch_labels_type = "ip_address";
-  this.host_labels_type = "ip";
+  this.switch_labels_type = "customize";
+  this.host_labels_type = "customize";
 
   this.fix_layout = true;
 
@@ -316,6 +316,7 @@ var D3Force = function(nodes, links, div) {
     var switches = d3.selectAll(".node.switch, .node.ovs");
     switches.append("text")
       .attr("x", 0)
+      .attr("y", 65)
       .attr("dy", ".35em")
       .style("fill", "white")
       .attr("class", "switch-label")
@@ -659,15 +660,30 @@ var D3Force = function(nodes, links, div) {
     .append('pattern')
     .attr('id', 'mellanox')
     .attr('patternUnits', 'userSpaceOnUse')
-    .attr('width', 100)
-    .attr('height', 100)
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
     .append("image")
     .attr("xlink:href", "/static/assets/images/mellanox.jpg")
     // .attr("src", "/static/assets/images/mellanox.jpg")
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('width', 100)
-    .attr('height', 100);
+    .attr('width', 110)
+    .attr('height', 110);
+
+  this.svg.append('defs')
+    .append('pattern')
+    .attr('id', 'dell')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/dell.png")
+    // .attr("src", "/static/assets/images/mellanox.jpg")
+    .attr('width', 110)
+    .attr('height', 110)
+    .attr('fill', 'black');
 
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
@@ -828,12 +844,12 @@ var D3Force = function(nodes, links, div) {
 
   this.node.append("circle")
     .attr('pointer-events', 'all')
-    .attr("class", function(d) {
+    .attr("fill", function(d) {
       if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
-        return "mellanox-circle";
+        return "url(#mellanox)";
       }
       else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('dell')) {
-        return "dell-circle";
+        return "url(#dell)";
       }
       return d['type'] + "-circle";
     })
