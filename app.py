@@ -372,6 +372,12 @@ def l2routes():
     source_mac = data['source-mac']
     destination_mac = data['destination-mac']
 
+    src_vlan = data['source-vlan'] if 'source-vlan' in data else 0
+    dst_vlan = data['destination-vlan'] if 'destination-vlan' in data else 0
+
+    if src_vlan == 0 and dst_vlan == 0:
+        flask.abort(500, "Only one attachment point can have a vlan tag!")
+
     credentials = (odl_user, odl_pass)
     odl = ODLInstance(odl_server, credentials)
     graph = odl.topology.get_networkx_graph()
@@ -387,9 +393,9 @@ def l2routes():
         if destination_mac:
             path.append('host:' + destination_mac)
         paths.append({'uid': uid, 'path': path})
-        session_l2paths[client_ip][uid] = path
+        session_l2paths[client_ip][uid] = {'path': path, 'src-vlan': src_vlan, 'dst-vlan': dst_vlan}
 
-    return flask.jsonify({'paths': paths})
+    return flask.jsonify({'paths': paths, 'vlan': vlan})
 
 @app.route('/routes/l3', methods=['POST'])
 @requires_auth
@@ -485,6 +491,9 @@ def install_flows_for_l2path(path_id):
     client_ip = "%s" % flask.request.environ['REMOTE_ADDR']
     try:
         path = session_l2paths[client_ip][path_id]
+        path, src_vlan, dst_vlan = path['path'], path['src-vlan'], path['dst-vlan']
+        src_vlan = src_vlan if src_vlan != 0 else None
+        dst_vlan = dst_vlan if dst_vlan != 0 else None
     except KeyError:
         flask.abort(404)
 
@@ -501,6 +510,12 @@ def install_flows_for_l2path(path_id):
 
     # Install a flow in each switch on the path with correct output
     # port.
+    if dst_vlan != 0:
+        source_host, target_host = target_host, source_host
+        src_vlan, dst_vlan = dst_vlan, src_vlan
+        ports.reverse()
+
+    first = False
     for source_port, target_port in ports:
         source_switch = "%s:%s" % (source_port.split(":")[0], source_port.split(":")[1])
         target_switch = "%s:%s" % (target_port.split(":")[0], target_port.split(":")[1])
@@ -523,8 +538,29 @@ def install_flows_for_l2path(path_id):
 
         print "Inserting flow for %s..." % node.id
 
+        flow_name = "L2AR%s" % path_id.split('-')[0]
+        if first:
+            table.l2output(flow_name = flow_name,
+                           in_port = source_port,
+                           connector_id = target_port,
+                           source = source_host,
+                           desitnation = target_host,
+                           template_dir = template_dir,
+                           ingress_vlan = src_vlan)
+
+            table.l2output(flow_name = flow_name,
+                           in_port = target_port,
+                           connector_id = source_port,
+                           source = target_host,
+                           destination = source_host,
+                           template_dir = template_dir,
+                           egress_vlan = src_vlan)
+
+            first = True
+            continue
+
         # Install the flow one way
-        table.l2output(flow_name = "L2AR%s" % path_id.split("-")[0],
+        table.l2output(flow_name = flow_name,
                        in_port = source_port,
                        connector_id = target_port,
                        source = source_host,
@@ -532,7 +568,7 @@ def install_flows_for_l2path(path_id):
                        template_dir = template_dir)
 
         # Install the flow another way
-        table.l2output(flow_name = "L2AR%s" % path_id.split("-")[0],
+        table.l2output(flow_name = flow_name,
                        in_port = target_port,
                        connector_id = source_port,
                        source = target_host,
