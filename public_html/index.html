@@ -5,6 +5,7 @@
     <meta content="utf-8" http-equiv="encoding">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
+    <meta http-equiv="refresh" content="200">
     <meta name="author" content="">
 
     <title>OpenFlow Next Generation Project - Web GUI</title>
@@ -786,14 +787,22 @@ information: <br><br>
                stats[source] = 0.3 + 0.7 * stat/3;
              });
 
+             d3.selectAll(".link-link, .host-link")
+               .style("opacity", "0.3")
+               .style("cursor", null)
+               .classed('active-link', false);
+
              Object.keys(stats).forEach(function (source) {
-               d3.selectAll('.link-' + source).style("opacity", stats[source]);
+               d3.selectAll('.link-' + source)
+                 .style("opacity", stats[source])
+                 .classed('active-link', true);
              });
            },
            dataType: "json"
          });
        }
 
+       show_traffic();
        setInterval(show_traffic, 10000);
      });
     </script>

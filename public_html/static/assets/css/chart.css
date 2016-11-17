@@ -40,6 +40,17 @@
   stroke-width: 50px;
 }
 
+.active-link {
+  stroke-dasharray: 5;
+  animation: dash 200s linear;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 1000;
+  }
+}
+
 .switch-circle {
   //fill: #CCFFFF;
   stroke: #99CCCC;
