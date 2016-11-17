@@ -187,14 +187,27 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
   var modal = $('#L2RouteCalculationModal');
   var source = modal.find("#l2source")[0]['value'];
   var destination = modal.find("#l2destination")[0]['value'];
+  var source_type = modal.find("#l2source-type").val();
   var enable_source_gateway = modal.find("#enable-l2source-gateway").prop('checked');
   var source_mac, destination_mac;
+  var source_vlan, destination_vlan;
   if (enable_source_gateway) {
-    source_mac = modal.find("#l2source-address").val();
+    if (source_type == 'address') {
+      source_mac = modal.find("#l2source-address").val();
+    }
+    else if (source_type == 'vlan') {
+      source_vlan = modal.find("#l2source-address").val();
+    }
   }
+  var destination_type = modal.find("#l2destination_type").val();
   var enable_destination_gateway = modal.find("#enable-l2destination-gateway").prop('checked');
   if (enable_destination_gateway) {
-    destination_mac = modal.find("#l2destination-address").val();
+    if (destination_type == 'address') {
+      destination_mac = modal.find("#l2destination-address").val();
+    }
+    else if (destination_type == 'vlan') {
+      destination_vlan = modal.find("#l2destination-vlan").val();
+    }
   }
 
   // Remote Store
@@ -212,8 +225,10 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
     },
     data: JSON.stringify({'source': source,
                           'source-mac': source_mac || '',
+                          'source-vlan': source_vlan || '',
                           'destination': destination,
-                          'destination-mac': destination_mac || ''}),
+                          'destination-mac': destination_mac || '',
+                          'destination-vlan': destination_vlan || ''}),
     success: function (data) {
       display_paths(source, destination, data['paths']);
       modal.modal('toggle');

@@ -395,10 +395,10 @@ def l2routes():
     source_mac = data['source-mac']
     destination_mac = data['destination-mac']
 
-    src_vlan = data['source-vlan'] if 'source-vlan' in data else 0
-    dst_vlan = data['destination-vlan'] if 'destination-vlan' in data else 0
+    src_vlan = data['source-vlan'] if 'source-vlan' in data.keys() else ''
+    dst_vlan = data['destination-vlan'] if 'destination-vlan' in data.keys() else ''
 
-    if src_vlan == 0 and dst_vlan == 0:
+    if src_vlan != '' and dst_vlan != '':
         flask.abort(500, "Only one attachment point can have a vlan tag!")
 
     credentials = (odl_user, odl_pass)
@@ -418,7 +418,7 @@ def l2routes():
         paths.append({'uid': uid, 'path': path})
         session_l2paths[client_ip][uid] = {'path': path, 'src-vlan': src_vlan, 'dst-vlan': dst_vlan}
 
-    return flask.jsonify({'paths': paths, 'vlan': vlan})
+    return flask.jsonify({'paths': paths})
 
 @app.route('/routes/l3', methods=['POST'])
 @requires_auth
@@ -515,8 +515,8 @@ def install_flows_for_l2path(path_id):
     try:
         path = session_l2paths[client_ip][path_id]
         path, src_vlan, dst_vlan = path['path'], path['src-vlan'], path['dst-vlan']
-        src_vlan = src_vlan if src_vlan != 0 else None
-        dst_vlan = dst_vlan if dst_vlan != 0 else None
+        src_vlan = src_vlan if src_vlan != '' else None
+        dst_vlan = dst_vlan if dst_vlan != '' else None
     except KeyError:
         flask.abort(404)
 
@@ -533,12 +533,12 @@ def install_flows_for_l2path(path_id):
 
     # Install a flow in each switch on the path with correct output
     # port.
-    if dst_vlan != 0:
+    if dst_vlan:
         source_host, target_host = target_host, source_host
         src_vlan, dst_vlan = dst_vlan, src_vlan
         ports.reverse()
 
-    first = False
+    first = src_vlan
     for source_port, target_port in ports:
         source_switch = "%s:%s" % (source_port.split(":")[0], source_port.split(":")[1])
         target_switch = "%s:%s" % (target_port.split(":")[0], target_port.split(":")[1])
@@ -567,7 +567,7 @@ def install_flows_for_l2path(path_id):
                            in_port = source_port,
                            connector_id = target_port,
                            source = source_host,
-                           desitnation = target_host,
+                           destination = target_host,
                            template_dir = template_dir,
                            ingress_vlan = src_vlan)
 
@@ -579,7 +579,7 @@ def install_flows_for_l2path(path_id):
                            template_dir = template_dir,
                            egress_vlan = src_vlan)
 
-            first = True
+            first = False
             continue
 
         # Install the flow one way
