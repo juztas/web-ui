@@ -731,36 +731,71 @@ information: <br><br>
 </div>
 
     <script language="javascript">
-      $(document).ready(function() {
+     $(document).ready(function() {
 
-        $.ajax({
-          type: "GET",
-          url: "/api/topology",
-          headers: {
-            "Authorization": "Basic " + (Cookies.get('auth') || "")
-          },
-          statusCode: {
-            401: function() {
-              window.location.href = "/login.html";
-            },
-            404: function() {
-              chart = new D3Force(test_tt['nodes'],
-                                  test_tt['links'],
-                                  "#graph");
-              chart.load_layout();
-            }
-          },
-          success: function (topology) {
-                    // Load main chart
-                    chart = new D3Force(topology['nodes'],
-                                        topology['links'],
-                                        "#graph");
-                    chart.load_layout();
+       $.ajax({
+         type: "GET",
+         url: "/api/topology",
+         headers: {
+           "Authorization": "Basic " + (Cookies.get('auth') || "")
+         },
+         statusCode: {
+           401: function() {
+             window.location.href = "/login.html";
+           },
+           404: function() {
+             chart = new D3Force(test_tt['nodes'],
+                                 test_tt['links'],
+                                 "#graph");
+             chart.load_layout();
+           }
+         },
+         success: function (topology) {
+           // Load main chart
+           chart = new D3Force(topology['nodes'],
+                               topology['links'],
+                               "#graph");
+           chart.load_layout();
 
-                   },
-          dataType: "json"
-        });
-      });
+         },
+         dataType: "json"
+       });
+
+       var show_traffic = function() {
+         $.ajax({
+           type: "GET",
+           contentType: "application/json; charset=utf-8",
+           url: "api/stats/all",
+           headers: {
+             "Authorization": "Basic " + (Cookies.get('auth') || "")
+           },
+           statusCode: {
+             401: function() {
+               window.location.href = "/login.html";
+             }
+           },
+           success: function (data) {
+             var stats = {};
+
+             Object.keys(data).forEach(function(connector) {
+               var source = connector.replace(/:/g, '\\\:').replace(/\./g, '\\\.');
+               stat = (Math.log2(data[connector])+3)/10;
+               if (stat > 3) {
+                 stat = 3;
+               }
+               stats[source] = 0.3 + 0.7 * stat/3;
+             });
+
+             Object.keys(stats).forEach(function (source) {
+               d3.selectAll('.link-' + source).style("opacity", stats[source]);
+             });
+           },
+           dataType: "json"
+         });
+       }
+
+       setInterval(show_traffic, 10000);
+     });
     </script>
 
     <script src="/static/assets/js/events.js"></script>

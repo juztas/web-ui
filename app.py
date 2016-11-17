@@ -59,7 +59,7 @@ def get_rrd_stats(node_id, table_id, clean_flow_id, diff=60 * 15):
 
     data = []
     if os.path.isfile(filename):
-        result = rrdtool.fetch(filename, 'AVERAGE', '--start', str(begin), '--end', str(end), '-r', str(10))
+        result = rrdtool.fetch(filename, 'AVERAGE', '--start', str(begin), '--end', str(end), '-r', str(30))
         keys = result[1]
         values = result[2]
         begin = result[0][0]
@@ -348,6 +348,29 @@ def e2e_stats(path_id, diff):
                           'oposite': oposite,
                           'source': source_host,
                           'target': target_host})
+
+@app.route('/stats/all', methods=['GET'])
+@requires_auth
+def all_stats():
+    """
+    Get all statistics information for each node
+    """
+    credentials = (odl_user, odl_pass)
+    odl = ODLInstance(odl_server, credentials)
+    nodes = odl.get_nodes()
+    all_stats = {}
+    for node in nodes.values():
+        tables = node.get_tables()
+        for table in tables.values():
+            for flow in table.get_all_flows().values():
+                for action in flow.get_actions():
+                    if action['type'] == 'output-action':
+                        connector = node.id + ":" + action['value']
+                        stat = get_rrd_stats(node.id, table.id, flow.clean_id, 120)
+                        rates = map(lambda x: x['bytes'], stat)
+                        rate = sum(rates) / len(rates) if rates else 0
+                        all_stats[connector] = all_stats.get(connector, 0) + rate
+    return flask.jsonify(all_stats)
 
 
 @app.route('/routes/l2', methods=['POST'])
