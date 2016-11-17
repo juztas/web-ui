@@ -192,22 +192,14 @@ $("#L2RouteCalculationFormSubmit").click(function(e) {
   var source_mac, destination_mac;
   var source_vlan, destination_vlan;
   if (enable_source_gateway) {
-    if (source_type == 'address') {
-      source_mac = modal.find("#l2source-address").val();
-    }
-    else if (source_type == 'vlan') {
-      source_vlan = modal.find("#l2source-address").val();
-    }
+    source_mac = modal.find("#l2source-address").val() || "";
+    source_vlan = modal.find("#l2source-address").val() || "";
   }
   var destination_type = modal.find("#l2destination_type").val();
   var enable_destination_gateway = modal.find("#enable-l2destination-gateway").prop('checked');
   if (enable_destination_gateway) {
-    if (destination_type == 'address') {
-      destination_mac = modal.find("#l2destination-address").val();
-    }
-    else if (destination_type == 'vlan') {
-      destination_vlan = modal.find("#l2destination-vlan").val();
-    }
+    destination_mac = modal.find("#l2destination-address").val() || "";
+    destination_vlan = modal.find("#l2destination-vlan").val() || "";
   }
 
   // Remote Store
@@ -292,15 +284,6 @@ $('#l2source-gateway').change(function() {
       el.value = port.id;
       source.append(el);
     });
-  }
-});
-
-$('#l2source-type').change(function() {
-  var type = $(this).val();
-  if (type == "address") {
-    $('#l2source-address').attr('placeholder', 'Specify the MAC address for source');
-  } else if (type == "vlan") {
-    $('#l2source-address').attr('placeholder', 'Specify the VLAN ID for source');
   }
 });
 

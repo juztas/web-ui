@@ -184,14 +184,13 @@
                 </div>
               </div>
               <div id="l2source-input" style="display:none;" class="form-group">
-                <div class="col-sm-3">
-                  <select id="l2source-type" name="source-type" class="form-control">
-                    <option value="address">Address</option>
-                    <option value="vlan">VLAN ID</option>
-                  </select>
-                </div>
+                <label for="Address" class="col-sm-2 control-label">Address</label>
                 <div class="col-sm-9">
                   <input id="l2source-address" name="l2source-address" class="form-control" placeholder="Specify the MAC address for source">
+                </div>
+                <label for="VLAN Id" class="col-sm-2 control-label">VLAN Id</label>
+                <div class="col-sm-9">
+                  <input id="l2source-vlan" name="l2source-vlan" class="form-control" placeholder="Specify the VLAN id for source">
                 </div>
               </div>
               <div class="form-group">
@@ -214,14 +213,13 @@
                 </div>
               </div>
               <div id="l2destination-input" style="display:none;" class="form-group">
-                <div class="col-sm-3">
-                  <select id="l2destination-type" name="destination-type" class="form-control">
-                    <option value="address">Address</option>
-                    <option value="vlan">VLAN ID</option>
-                  </select>
-                </div>
+                <label for="Address" class="col-sm-2 control-label">Address</label>
                 <div class="col-sm-9">
                   <input id="l2destination-address" name="l2destination-address" class="form-control" placeholder="Specify the MAC address for destination">
+                </div>
+                <label for="VLAN Id" class="col-sm-2 control-label">VLAN Id</label>
+                <div class="col-sm-9">
+                  <input id="l2destination-vlan" name="l2destination-address" class="form-control" placeholder="Specify the VLAN id for destination">
                 </div>
               </div>
             </form>
