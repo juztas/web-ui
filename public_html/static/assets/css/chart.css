@@ -41,8 +41,8 @@
 }
 
 .active-link {
-  stroke-dasharray: 5;
-  animation: dash 200s linear;
+  stroke-dasharray: 100;
+  animation: dash 10s linear infinite;
 }
 
 @keyframes dash {

@@ -280,6 +280,15 @@ $('#l2source-gateway').change(function() {
   }
 });
 
+$('#l2source-type').change(function() {
+  var type = $(this).val();
+  if (type == "address") {
+    $('#l2source-address').attr('placeholder', 'Specify the MAC address for source');
+  } else if (type == "vlan") {
+    $('#l2source-address').attr('placeholder', 'Specify the VLAN ID for source');
+  }
+});
+
 $('#enable-l2destination-gateway').change(function() {
   var modal = $("#L2RouteCalculationModal");
   var destination_gateway = modal.find('#l2destination-gateway');
@@ -332,6 +341,15 @@ $('#l2destination-gateway').change(function() {
       el.value = port.id;
       destination.append(el);
     });
+  }
+});
+
+$('#l2destination-type').change(function() {
+  var type = $(this).val();
+  if (type == "address") {
+    $('#l2destination-address').attr('placeholder', 'Specify the MAC address for destination');
+  } else if (type == "vlan") {
+    $('#l2destination-address').attr('placeholder', 'Specify the VLAN ID for destination');
   }
 });
 
@@ -461,15 +479,26 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
   var source = modal.find("#l3source")[0]['value'];
   var destination = modal.find("#l3destination")[0]['value'];
   var enable_source_gateway = modal.find("#enable-l3source-gateway").prop('checked');
+  var source_type = modal.find("#l3source-type").val();
   var source_ip, destination_ip;
+  var source_vlan, destination_vlan;
   if (enable_source_gateway) {
-    source_ip = modal.find("#l3source-address").val();
-    source_ip = source_ip || '*';
+    if (source_type == 'address') {
+      source_ip = modal.find("#l3source-address").val();
+    }
+    else if (source_type == 'vlan') {
+      source_vlan = modal.find("#l3source-address").val();
+    }
   }
+  var destination_type = modal.find("#l3destination_type").val();
   var enable_destination_gateway = modal.find("#enable-l3destination-gateway").prop('checked');
   if (enable_destination_gateway) {
-    destination_ip = modal.find("#l3destination-address").val();
-    destination_ip = destination_ip || '*';
+    if (destination_type == 'address') {
+      destination_ip = modal.find("#l3destination-address").val();
+    }
+    else if (destination_type == 'vlan') {
+      destination_vlan = modal.find("#l3destination-vlan").val();
+    }
   }
 
   // Remote Store
@@ -487,8 +516,10 @@ $("#L3RouteCalculationFormSubmit").click(function(e) {
     },
     data: JSON.stringify({'source': source,
                           'source-ip': source_ip || '',
+                          'source-vlan': source_vlan || '',
                           'destination': destination,
-                          'destination-ip': destination_ip || ''}),
+                          'destination-ip': destination_ip || '',
+                          'destination-vlan': destination_vlan || ''}),
     success: function (data) {
       display_paths(source, destination, data['paths']);
       modal.modal('toggle');
@@ -560,6 +591,15 @@ $('#l3source-gateway').change(function() {
   }
 });
 
+$('#l3source-type').change(function() {
+  var type = $(this).val();
+  if (type == "address") {
+    $('#l3source-address').attr('placeholder', 'Specify the MAC address for destination');
+  } else if (type == "vlan") {
+    $('#l3source-address').attr('placeholder', 'Specify the VLAN ID for destination');
+  }
+});
+
 $('#enable-l3destination-gateway').change(function() {
   var modal = $("#L3RouteCalculationModal");
   var destination_gateway = modal.find('#l3destination-gateway');
@@ -617,6 +657,15 @@ $('#l3destination-gateway').change(function() {
       el.value = port.id;
       destination.append(el);
     });
+  }
+});
+
+$('#l3destination-type').change(function() {
+  var type = $(this).val();
+  if (type == "address") {
+    $('#l3destination-address').attr('placeholder', 'Specify the MAC address for destination');
+  } else if (type == "vlan") {
+    $('#l3destination-address').attr('placeholder', 'Specify the VLAN ID for destination');
   }
 });
 

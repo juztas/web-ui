@@ -54,7 +54,7 @@ var D3Force = function(nodes, links, div) {
 
   this.fadeout_all = function() {
     d3.selectAll(".node").style("opacity", "1");
-    d3.selectAll(".link-link, .host-link").style("opacity", "0.3").style("cursor", null);
+    d3.selectAll(".link-link, .host-link").style("opacity", "0.5").style("cursor", null);
     $("nav").hide();
     toggle_task_timer = false;
     clearTimeout(task_management_timer);
@@ -245,6 +245,8 @@ var D3Force = function(nodes, links, div) {
       success: function(positions) {
         _this.positions_cache = positions;
         _this.load_layout_from_positions(_this.positions_cache);
+        _this.show_switch_labels(_this.switch_labels_type);
+        _this.show_host_labels(_this.host_labels_type);
       },
       dataType: "json"
     });

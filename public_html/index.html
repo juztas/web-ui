@@ -5,7 +5,6 @@
     <meta content="utf-8" http-equiv="encoding">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta http-equiv="refresh" content="200">
     <meta name="author" content="">
 
     <title>OpenFlow Next Generation Project - Web GUI</title>
@@ -185,8 +184,13 @@
                 </div>
               </div>
               <div id="l2source-input" style="display:none;" class="form-group">
-                <label for="l2source-address" class="col-sm-2 control-label">Address:</label>
-                <div class="col-sm-10">
+                <div class="col-sm-3">
+                  <select id="l2source-type" name="source-type" class="form-control">
+                    <option value="address">Address</option>
+                    <option value="vlan">VLAN ID</option>
+                  </select>
+                </div>
+                <div class="col-sm-9">
                   <input id="l2source-address" name="l2source-address" class="form-control" placeholder="Specify the MAC address for source">
                 </div>
               </div>
@@ -203,15 +207,20 @@
               </div>
               <div class="form-group">
                 <label for="destination" class="col-sm-2 control-label">Destination:</label>
-                <div class="col-sm-10">
+                <div class="col-sm-4">
                 <select id="l2destination" name="destination" class="form-control">
                   <option>Choose a destination host</option>
                 </select>
                 </div>
               </div>
               <div id="l2destination-input" style="display:none;" class="form-group">
-                <label for="l2destination-address" class="col-sm-2 control-label">Address:</label>
-                <div class="col-sm-10">
+                <div class="col-sm-3">
+                  <select id="l2destination-type" name="destination-type" class="form-control">
+                    <option value="address">Address</option>
+                    <option value="vlan">VLAN ID</option>
+                  </select>
+                </div>
+                <div class="col-sm-9">
                   <input id="l2destination-address" name="l2destination-address" class="form-control" placeholder="Specify the MAC address for destination">
                 </div>
               </div>
@@ -249,8 +258,13 @@
               </div>
 
               <div class="form-group">
-                <label for="source" class="col-sm-2 control-label">Source:</label>
-                <div class="col-sm-10">
+                <div class="col-sm-3">
+                  <select id="l3source-type" name="source-type" class="form-control">
+                    <option value="address">Address</option>
+                    <option value="vlan">VLAN ID</option>
+                  </select>
+                </div>
+                <div class="col-sm-9">
 
                   <select id="l3source" name="source" class="form-control">
                     <option>Choose a source host</option>
@@ -278,8 +292,13 @@
               </div>
 
               <div class="form-group">
-                <label for="destination" class="col-sm-2 control-label">Destination:</label>
-                <div class="col-sm-10">
+                <div class="col-sm-3">
+                  <select id="l3destination-type" name="destination-type" class="form-control">
+                    <option value="address">Address</option>
+                    <option value="vlan">VLAN ID</option>
+                  </select>
+                </div>
+                <div class="col-sm-9">
                   <select id="l3destination" name="destination" class="form-control">
                     <option>Choose a destination host</option>
                   </select>
@@ -784,11 +803,11 @@ information: <br><br>
                if (stat > 3) {
                  stat = 3;
                }
-               stats[source] = 0.3 + 0.7 * stat/3;
+               stats[source] = 0.5 + 0.5 * stat/3;
              });
 
              d3.selectAll(".link-link, .host-link")
-               .style("opacity", "0.3")
+               .style("opacity", "0.5")
                .style("cursor", null)
                .classed('active-link', false);
 
