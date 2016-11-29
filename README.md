@@ -15,5 +15,9 @@ This is a collaborative project between SPRACE (From São Paulo State University
 
 For a complete list of people, please see the AUTHORS.md file.
 
+## License
+
+This software is under _MIT-License_. For more information please read 
+`LICENSE` file.
 
 
