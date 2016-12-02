@@ -1,13 +1,13 @@
 .link-link {
   fill: none;
 /*  stroke: #999; */
-  stroke-width: 1.5px;
+  stroke-width: 2px;
 }
 
 .host-link {
   fill: none;
 /*  stroke: #999; */
-  stroke-width: 1.5px;
+  stroke-width: 2px;
 }
 
 .port-link {
@@ -22,7 +22,7 @@
 
 .ten-ge-link {
   stroke: #996633;
-  stroke-width: 1.5px;
+  stroke-width: 2px;
 }
 
 .forty-ge-link {
@@ -73,6 +73,18 @@
   stroke: #FFCC00;
   stroke-width: 1.5px;
   fill: #FFCC00;
+}
+
+.mellanox-circle {
+  fill: url(/index.html#mellanox)
+}
+
+.dell-circle {
+  fill: url(/index.html#dell)
+}
+
+.pic-circle {
+  fill: url(/index.html#pica8)
 }
 
 node {

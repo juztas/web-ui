@@ -658,8 +658,9 @@ var D3Force = function(nodes, links, div) {
     .on("dblclick.zoom", null)
     .append('svg:g');
 
-  this.svg.append('defs')
-    .append('pattern')
+  this.defs = this.svg.append('defs');
+
+  this.defs.append('pattern')
     .attr('id', 'mellanox')
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('x', -55)
@@ -668,12 +669,10 @@ var D3Force = function(nodes, links, div) {
     .attr('height', 110)
     .append("image")
     .attr("xlink:href", "/static/assets/images/mellanox.jpg")
-    // .attr("src", "/static/assets/images/mellanox.jpg")
     .attr('width', 110)
     .attr('height', 110);
 
-  this.svg.append('defs')
-    .append('pattern')
+  this.defs.append('pattern')
     .attr('id', 'dell')
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('x', -55)
@@ -682,7 +681,19 @@ var D3Force = function(nodes, links, div) {
     .attr('height', 110)
     .append("image")
     .attr("xlink:href", "/static/assets/images/dell.png")
-    // .attr("src", "/static/assets/images/mellanox.jpg")
+    .attr('width', 110)
+    .attr('height', 110)
+    .attr('fill', 'black');
+
+  this.defs.append('pattern')
+    .attr('id', 'pica8')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/pica8.png")
     .attr('width', 110)
     .attr('height', 110)
     .attr('fill', 'black');
@@ -846,26 +857,23 @@ var D3Force = function(nodes, links, div) {
 
   this.node.append("circle")
     .attr('pointer-events', 'all')
-    .attr("fill", function(d) {
+    .attr("class", function(d) {
       if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
-        return "url(#mellanox)";
+        return "mellanox-circle";
       }
       else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('dell')) {
-        return "url(#dell)";
+        return "dell-circle";
       }
-      return d['type'] + "-circle";
+      else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('pic')) {
+        return "pic-circle";
+      }
+      else {
+        return d['type'] + "-circle";
+      }
     })
     .attr("r", function(d) {
       return size[d.type];
     });
-
-  // this.node.append("rect")
-  //   .attr("class", function(d) {
-  //     if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
-  //       return "mellanox-circle";
-  //     }
-  //     return '';
-  //   });
 
   d3.selectAll(".host")
     .append("text")
