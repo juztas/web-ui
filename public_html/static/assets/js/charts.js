@@ -668,9 +668,35 @@ var D3Force = function(nodes, links, div) {
     .attr('height', 110)
     .append("image")
     .attr("xlink:href", "/static/assets/images/mellanox.jpg")
-    // .attr("src", "/static/assets/images/mellanox.jpg")
     .attr('width', 110)
     .attr('height', 110);
+
+ this.svg.append('defs')
+    .append('pattern')
+    .attr('id', 'arista')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/arista.png")
+    .attr('width', 110)
+    .attr('height', 110);
+
+ this.svg.append('defs')
+    .append('pattern')
+    .attr('id', 'pica8')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/pica8.png")
+    .attr('width', 110)
+    .attr('height', 110)
+    .attr('fill', 'black');
 
   this.svg.append('defs')
     .append('pattern')
@@ -682,7 +708,6 @@ var D3Force = function(nodes, links, div) {
     .attr('height', 110)
     .append("image")
     .attr("xlink:href", "/static/assets/images/dell.png")
-    // .attr("src", "/static/assets/images/mellanox.jpg")
     .attr('width', 110)
     .attr('height', 110)
     .attr('fill', 'black');
@@ -847,25 +872,24 @@ var D3Force = function(nodes, links, div) {
   this.node.append("circle")
     .attr('pointer-events', 'all')
     .attr("fill", function(d) {
-      if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
+      //document.write(d['manufacturer'])
+      if      (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
         return "url(#mellanox)";
       }
-      else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('dell')) {
+      else if (d['manufacturer'] && d['manufacturer'].match(/ell/gi)) {
         return "url(#dell)";
+      }
+      else if (d['manufacturer'] && d['manufacturer'].match(/ica8/gi)) {
+        return "url(#pica8)";
+      }
+      else if (d['manufacturer'] && d['manufacturer'].match(/rista/gi)) {
+        return "url(#arista)";
       }
       return d['type'] + "-circle";
     })
     .attr("r", function(d) {
       return size[d.type];
     });
-
-  // this.node.append("rect")
-  //   .attr("class", function(d) {
-  //     if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
-  //       return "mellanox-circle";
-  //     }
-  //     return '';
-  //   });
 
   d3.selectAll(".host")
     .append("text")
