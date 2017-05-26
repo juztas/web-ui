@@ -711,6 +711,19 @@ var D3Force = function(nodes, links, div) {
     .attr('width', 110)
     .attr('height', 110)
     .attr('fill', 'black');
+this.svg.append('defs')
+    .append('pattern')
+    .attr('id', 'juniper')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/juniper.png")
+    .attr('width', 110)
+    .attr('height', 110)
+    .attr('fill', 'black');
 
   this.link = this.svg.selectAll(".link")
     .data(this.force.links())
@@ -873,7 +886,7 @@ var D3Force = function(nodes, links, div) {
     .attr('pointer-events', 'all')
     .attr("fill", function(d) {
       //document.write(d['manufacturer'])
-      if      (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
+      if      (d['manufacturer'] && d['manufacturer'].match('ellanox')) {
         return "url(#mellanox)";
       }
       else if (d['manufacturer'] && d['manufacturer'].match(/ell/gi)) {
@@ -884,6 +897,9 @@ var D3Force = function(nodes, links, div) {
       }
       else if (d['manufacturer'] && d['manufacturer'].match(/rista/gi)) {
         return "url(#arista)";
+      }
+      else if (d['manufacturer'] && d['manufacturer'].match(/uniper/gi)) {
+        return "url(#juniper)";
       }
       return d['type'] + "-circle";
     })
