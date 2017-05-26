@@ -673,6 +673,18 @@ var D3Force = function(nodes, links, div) {
     .attr('height', 110);
 
   this.defs.append('pattern')
+    .attr('id', 'arista')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/arista.png")
+    .attr('width', 110)
+    .attr('height', 110);
+
+  this.defs.append('pattern')
     .attr('id', 'dell')
     .attr('patternUnits', 'userSpaceOnUse')
     .attr('x', -55)
@@ -694,6 +706,19 @@ var D3Force = function(nodes, links, div) {
     .attr('height', 110)
     .append("image")
     .attr("xlink:href", "/static/assets/images/pica8.png")
+    .attr('width', 110)
+    .attr('height', 110)
+    .attr('fill', 'black');
+
+  this.defs.append('pattern')
+    .attr('id', 'juniper')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', -55)
+    .attr('y', -55)
+    .attr('width', 110)
+    .attr('height', 110)
+    .append("image")
+    .attr("xlink:href", "/static/assets/images/juniper.png")
     .attr('width', 110)
     .attr('height', 110)
     .attr('fill', 'black');
@@ -858,14 +883,17 @@ var D3Force = function(nodes, links, div) {
   this.node.append("circle")
     .attr('pointer-events', 'all')
     .attr("class", function(d) {
-      if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('mellanox')) {
+      if (d['manufacturer'] && d['manufacturer'].match(/mellanox/gi)) {
         return "mellanox-circle";
       }
-      else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('dell')) {
+      else if (d['manufacturer'] && d['manufacturer'].match(/dell/gi)) {
         return "dell-circle";
       }
-      else if (d['manufacturer'] && d['manufacturer'].toLowerCase().match('pic')) {
+      else if (d['manufacturer'] && d['manufacturer'].match(/pic/gi)) {
         return "pic-circle";
+      }
+      else if (d['manufacturer'] && d['manufacturer'].match(/juniper/gi)) {
+        return "juniper-circle";
       }
       else {
         return d['type'] + "-circle";

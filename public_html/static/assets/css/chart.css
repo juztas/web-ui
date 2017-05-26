@@ -79,12 +79,20 @@
   fill: url(/index.html#mellanox)
 }
 
+.arista-circle {
+  fill: url(/index.html#arista)
+}
+
 .dell-circle {
   fill: url(/index.html#dell)
 }
 
 .pic-circle {
   fill: url(/index.html#pica8)
+}
+
+.juniper-circle {
+  fill: url(/index.html#juniper)
 }
 
 node {

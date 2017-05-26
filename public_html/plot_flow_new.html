@@ -184,6 +184,17 @@
        }
      };
 
+     var ewma = function(line) {
+	     var new_line = []
+	     var last = 0;
+	     for (var i=0; i < line.length; i++) {
+		     var last = last + line[i];
+		     var x = 0.05 * last / (i+1) + 0.95 * line[i]
+		     new_line.push(x)
+	     }
+	     return new_line;
+     }
+
      var clear_plot_div = function() {
        extraPlotDiv.forEach(function(div) {
          Plotly.purge(div);
