@@ -886,6 +886,9 @@ var D3Force = function(nodes, links, div) {
       if (d['manufacturer'] && d['manufacturer'].match(/mellanox/gi)) {
         return "mellanox-circle";
       }
+      else if (d['manufacturer'] && d['manufacturer'].match(/aris/gi)) {
+        return "arista-circle";
+      }
       else if (d['manufacturer'] && d['manufacturer'].match(/dell/gi)) {
         return "dell-circle";
       }
